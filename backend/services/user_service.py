@@ -1,11 +1,9 @@
 import pymysql
 
 from backend.database.data_access import DataAccess
-from flask import jsonify
-
 
 #  GET ALL Users
-def get_users(questionnaire_id):
+def get_users():
     data_access = DataAccess()
     try:
         users = data_access.query("SELECT id, username, name FROM User")

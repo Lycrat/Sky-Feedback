@@ -30,9 +30,16 @@ def mock_services(monkeypatch):
             return {"id": 1, "name": "John Doe", "username": "johndoe"}
         return None
     
+    def mock_get_all_users():
+        return [
+            {"id": 1, "name": "John Doe", "username": "johndoe"},
+            {"id": 2, "name": "Jane Smith", "username": "janesmith"},
+        ]
+
     # Apply monkeypatches
-    monkeypatch.setattr(user_service, "create_user", mock_create_user)
+    monkeypatch.setattr(user_service, "add_user", mock_create_user)
     monkeypatch.setattr(user_service, "get_user", mock_get_user)
+    monkeypatch.setattr(user_service, "get_users", mock_get_all_users)
 
 # ---- TESTS ----
 def test_create_user(client, mock_services):
@@ -60,4 +67,12 @@ def test_get_user_not_found(client, mock_services):
     assert "error" in response.json
     assert response.json["error"] == "User not found"
 
-
+def test_get_all_users(client, mock_services):
+    response = client.get("/api/user/")
+    assert response.status_code == 200
+    assert isinstance(response.json, list)
+    assert len(response.json) == 2
+    for user in response.json:
+        assert "id" in user
+        assert "username" in user
+        assert "name" in user
