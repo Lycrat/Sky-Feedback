@@ -5,6 +5,7 @@ import { UserQuestionaire } from "./pages";
 import QuestionCreator from "./components/QuestionCreator";
 import HomeDashboard from "./pages/HomeDashboard";
 
+import ViewData from "./pages/ViewData";
 function App() {
   return (
     <>
@@ -13,8 +14,9 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<HomeDashboard />} />
             <Route path="/questionnaire/:id" element={<UserQuestionaire />} />
-            <Route path="question-creator" element={<QuestionCreator />} />
+            <Route path="/view-data" element={<ViewData />} />
           </Route>
+          <Route path="question-creator" element={<QuestionCreator />} />
         </Routes>
       </BrowserRouter>
     </>
