@@ -8,7 +8,7 @@ import {
   MenuItem,
 } from "@mui/material";
 
-const apiUrl = import.meta.env.VITE_API_URL;
+// const apiUrl = import.meta.env.VITE_API_URL;
 
 export const ViewData = ({ id, userId }) => {
   const [data, setData] = useState([
@@ -20,7 +20,9 @@ export const ViewData = ({ id, userId }) => {
   useEffect(() => {
     const handleFetchData = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/${id}/${userId}`);
+        const response = await axios.get(
+          `http://localhost:5000/${id}/${userId}`
+        );
         if (response.status === 200) {
           setData(response.data);
           console.log("Successful");
@@ -58,7 +60,7 @@ export const ViewData = ({ id, userId }) => {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 px-20 pt-20">
+    <div className="flex flex-col h-full bg-gray-100 px-20 pt-20">
       <div className="flex flex-row justify-between items-center text-gray-900">
         <h2 className="text-2xl">{data?.title ? data.title : "Form Title"}</h2>
         <FormControl

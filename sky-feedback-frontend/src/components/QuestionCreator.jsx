@@ -7,7 +7,7 @@ export const QuestionCreator = ({ onQuestionChange }) => {
     { id: Date.now(), text: "", type: "textarea", options: [] },
   ]);
 
-    useEffect(() => {
+  useEffect(() => {
     if (onQuestionChange) {
       onQuestionChange(questions);
     }
@@ -27,7 +27,8 @@ export const QuestionCreator = ({ onQuestionChange }) => {
           ? {
               ...q,
               [field]: value,
-              options: field === "type" && value !== "multiple" ? [] : q.options,
+              options:
+                field === "type" && value !== "multiple" ? [] : q.options,
             }
           : q
       )
@@ -41,9 +42,7 @@ export const QuestionCreator = ({ onQuestionChange }) => {
   const addOption = (qId) => {
     setQuestions((prev) =>
       prev.map((q) =>
-        q.id === qId
-          ? { ...q, options: [...q.options, ''] }
-          : q
+        q.id === qId ? { ...q, options: [...q.options, ""] } : q
       )
     );
   };
@@ -73,9 +72,8 @@ export const QuestionCreator = ({ onQuestionChange }) => {
 
   return (
     <div className="flex justify-center items-center min-h-screen min-w-screen bg-gray-50">
-        {console.log(questions)}
+      {console.log(questions)}
       <div className="flex flex-col justify-center items-center w-[80%] bg-gray-100 rounded-2xl p-8 border border-gray-200 overflow-y-auto padding-top-10 padding-bottom-10">
-
         {!questions ||
           (questions && questions.length < 1 && (
             <h1 className="flex justify-center items-center text-gray-400 !text-base">
@@ -110,6 +108,7 @@ export const QuestionCreator = ({ onQuestionChange }) => {
               </TextField>
 
               <IconButton
+                aria-label="delete"
                 color="error"
                 onClick={() => removeQuestion(question.id)}
                 className="self-center"
@@ -136,6 +135,7 @@ export const QuestionCreator = ({ onQuestionChange }) => {
                       className="flex-1"
                     />
                     <IconButton
+                      aria-label="Delete"
                       color="error"
                       onClick={() => removeOption(question.id, optIndex)}
                     >
