@@ -1,11 +1,11 @@
 import flask
-from routes import questionnaire_route
+from backend.routes.questionnaire_route import questionnaire_bp
 
 def create_app():
     # Initialize the Flask application
     app = flask.Flask(__name__)
     
-    app.register_blueprint(questionnaire_route.questionnaire_bp)
+    app.register_blueprint(questionnaire_bp)
 
     return app
 
