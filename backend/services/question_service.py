@@ -1,80 +1,69 @@
 import pymysql
 
-from database.data_access import DataAccess
+from backend.database.data_access import DataAccess
 from flask import jsonify
 
 #  GET ALL questions of a specific questionnaires
 def get_questions (questionnaire_id):
     data_access = DataAccess()
     try:
-        questionnaire = data_access.query("SELECT id, question_id, question FROM Question WHERE id = %s", (questionnaire_id))
+        questions = data_access.query("SELECT id, questionnaire_id, question FROM Question WHERE id = %s", questionnaire_id)
     except pymysql.MySQLError as e:
         raise RuntimeError(f'Database query error: {e}')
 
-    if not result:
-        return None
+    # Convert to a dictionary for easier consumption
+    return questions
+
+#  GET a specific question
+def get_question (question_id):
+
+    data_access = DataAccess()
+    try:
+        question = data_access.query("SELECT id, questionnaire_id, question FROM Question WHERE id = %s", question_id)
+    except pymysql.MySQLError as e:
+        raise RuntimeError(f'Database query error: {e}')
 
     # Convert to a dictionary for easier consumption
-    return result[0]
+    return question
 
-#  ADD questions
-def add_questions(question_list):
 
+#  ADD question
+def add_question(questionnaire_id, data):
+
+    question = data.get('question')
     try:
         data_access = DataAccess()
-        lastrowid = data_access.execute("INSERT INTO Questionnaire (title) VALUES (%s);",(questionnaire_title))
-        questionnaire = get_questionnaire(lastrowid)
+        lastrowid = data_access.execute("INSERT INTO Question (question, questionnaire_id) VALUES (%s, %s);",(question, questionnaire_id))
+        question = get_question(lastrowid)
 
         # Now add the questions to the question table
-        return jsonify({'title': questionnaire_title}), 201
+        return jsonify({'question': question}), 201
     except Exception as e:
         raise e
 
-# DELETE questionnaire
-def delete_questionnaire(data):
-    questionnaire_id = data.get('questionnaire_id')
-
-    if not questionnaire_id:
-        return jsonify({'error': 'Questionnaire id is required'}), 400
-
+# DELETE question
+def delete_question(question_id):
     try:
         data_access = DataAccess()
-        questionnaire = data_access.query("DELETE  FROM Questionnaire WHERE id = (%s);",(questionnaire_id))
+        rowid = data_access.execute("DELETE FROM Question WHERE id = (%s);", question_id)
+        question = get_question(rowid)
 
-        return jsonify({'title': questionnaire_title}), 201
+        return jsonify({'question': question}), 201
     except Exception as e:
         raise e
         
-def update_questionnaire(data):
-    # 'id' is required; other fields are optional
-    if 'questionnaire_id' not in data:
-        raise ValueError("Missing required field: 'questionnaire_id'")
+def update_question(question_id, data):
 
-     if 'question_id' not in data:
-        raise ValueError("Missing required field: 'question_id'")
+    if 'question' not in data:
+        raise ValueError("Missing required field: 'question'")
 
-    questionnaire_id = data['questionnaire_id']
-    set_clauses = []
-    params = []
+    question = data['question']
 
-    if 'title' in data:
-        set_clauses.append("title = %s")
-        params.append(data['title'])
+    data_access = DataAccess()
+    rowid = data_access.execute("UPDATE Question SET question=(%s) WHERE id = (%s);",(question, question_id))
+    question = get_question(rowid)
 
-    if not set_clauses:
-        raise ValueError("No updatable fields provided")
-
-    params.append(questionnaire_id)
-    update_query = f"UPDATE Questionnaire SET {', '.join(set_clauses)} WHERE id = %s"
-
-    dao = DataAccess()
-    dao.execute(update_query, params)
-
-    # Update the questions
-
-    # 
-
-    return get_questionnaire(questionnaire_id)
+    return question
 
 
 
