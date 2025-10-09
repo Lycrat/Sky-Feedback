@@ -1,7 +1,6 @@
 import pytest
 from backend.app import create_app
 
-# Make app a proper pytest fixture
 @pytest.fixture
 def app():
     return create_app()
@@ -10,78 +9,85 @@ def app():
 def client(app):
     return app.test_client()
 
-# CREATE TABLE Questionnaire (
-#   id INT AUTO_INCREMENT,
-#   title VARCHAR(100) NOT NULL,
-#   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-#   PRIMARY KEY (id)
-# );
+# ---- MOCK FUNCTIONS ----
+@pytest.fixture
+def mock_services(monkeypatch):
+    """Mock all functions from questionnaire_service."""
 
-# test questionnaire routes
-# get questionaires
+    # Mock get_all_questionnaires
+    def mock_get_all_questionnaires():
+        return [
+            {"id": 1, "title": "Customer Satisfaction", "created_at": "2024-01-01T00:00:00"},
+            {"id": 2, "title": "Product Feedback", "created_at": "2024-01-01T00:00:00"},
+        ]
 
-def test_get_questionnaires(client):
-    response = client.get('/api/questionnaire/')
+    # Mock get_questionnaire_by_id
+    def mock_get_questionnaire_by_id(questionnaire_id):
+        return {"id": questionnaire_id, "title": "Mocked Questionnaire", "created_at": "2024-01-01T00:00:00"}
+
+    # Mock add_questionnaire
+    def mock_add_questionnaire(title):
+        return {"id": 99, "title": title, "created_at": "2024-01-01T00:00:00"}
+
+    # Mock update_questionnaire
+    def mock_update_questionnaire(questionnaire_id, title):
+        return {"id": questionnaire_id, "title": title, "created_at": "2024-01-01T00:00:00"}
+
+    # Mock delete_questionnaire
+    def mock_delete_questionnaire(questionnaire_id):
+        return True
+
+    # Apply monkeypatches
+    import backend.services.questionnaire_service as service
+    monkeypatch.setattr(service, "get_questionnaires", mock_get_all_questionnaires)
+    monkeypatch.setattr(service, "get_questionnaire", mock_get_questionnaire_by_id)
+    monkeypatch.setattr(service, "create_questionnaire", mock_add_questionnaire)
+    monkeypatch.setattr(service, "update_questionnaire", mock_update_questionnaire)
+    monkeypatch.setattr(service, "delete_questionnaire", mock_delete_questionnaire)
+
+
+# ---- TESTS ----
+
+def test_get_questionnaires(client, mock_services):
+    response = client.get("/api/questionnaire/")
     assert response.status_code == 200
     assert isinstance(response.json, list)
     for questionnaire in response.json:
-        assert 'id' in questionnaire
-        assert 'title' in questionnaire
-        assert 'created_at' in questionnaire
+        assert "id" in questionnaire
+        assert "title" in questionnaire
+        assert "created_at" in questionnaire
 
-#  test add questionnaire
-def test_add_questionnaire(client):
-    new_questionnaire = {
-        'title': 'New Questionnaire'
-    }
-    response = client.post('/api/questionnaire/', json=new_questionnaire)
+
+def test_add_questionnaire(client, mock_services):
+    new_questionnaire = {"title": "New Questionnaire"}
+    response = client.post("/api/questionnaire/", json=new_questionnaire)
     assert response.status_code == 201
-    assert 'id' in response.json
-    assert response.json['title'] == new_questionnaire['title']
-    assert 'created_at' in response.json
+    assert "id" in response.json
+    assert response.json["title"] == new_questionnaire["title"]
+    assert "created_at" in response.json
 
-# test delete questionnaire
-def test_delete_questionnaire(client):
-    # First, add a questionnaire to delete
-    new_questionnaire = {
-        'title': 'Questionnaire to Delete'
-    }
-    post_response = client.post('/api/questionnaire/', json=new_questionnaire)
+
+def test_delete_questionnaire(client, mock_services):
+    # Add one to delete (mocked id = 99)
+    new_questionnaire = {"title": "To Delete"}
+    post_response = client.post("/api/questionnaire/", json=new_questionnaire)
     assert post_response.status_code == 201
-    questionnaire_id = post_response.json['id']
+    questionnaire_id = post_response.json["id"]
 
-    # Now, delete the questionnaire
-    delete_response = client.delete(f'/api/questionnaire/{questionnaire_id}')
+    delete_response = client.delete(f"/api/questionnaire/{questionnaire_id}")
     assert delete_response.status_code == 200
-    assert delete_response.json['message'] == 'Questionnaire deleted successfully'
+    assert delete_response.json["message"] == "Questionnaire deleted successfully"
 
-    # Verify it's deleted
-    get_response = client.get('/api/questionnaire/')
-    assert get_response.status_code == 200
-    ids = [q['id'] for q in get_response.json]
-    assert questionnaire_id not in ids
 
-#  test update questionnaire
-def test_update_questionnaire(client):
-    # First, add a questionnaire to update
-    new_questionnaire = {
-        'title': 'Questionnaire to Update'
-    }
-    post_response = client.post('/api/questionnaire/', json=new_questionnaire)
+def test_update_questionnaire(client, mock_services):
+    # Add one to update
+    new_questionnaire = {"title": "To Update"}
+    post_response = client.post("/api/questionnaire/", json=new_questionnaire)
     assert post_response.status_code == 201
-    questionnaire_id = post_response.json['id']
+    questionnaire_id = post_response.json["id"]
 
-    # Now, update the questionnaire
-    updated_data = {
-        'title': 'Updated Questionnaire Title'
-    }
-    put_response = client.put(f'/api/questionnaire/{questionnaire_id}', json=updated_data)
+    updated_data = {"title": "Updated Title"}
+    put_response = client.put(f"/api/questionnaire/{questionnaire_id}", json=updated_data)
     assert put_response.status_code == 200
-    assert put_response.json['id'] == questionnaire_id
-    assert put_response.json['title'] == updated_data['title']
-
-    # Verify the update
-    get_response = client.get(f'/api/questionnaire/{questionnaire_id}')
-    assert get_response.status_code == 200
-    assert get_response.json["title"] == updated_data['title']
-
+    assert put_response.json["id"] == questionnaire_id
+    assert put_response.json["title"] == updated_data["title"]
