@@ -63,6 +63,23 @@ END //
 delimiter ;
 
 
+delimiter //
+
+-- 
+
+CREATE PROCEDURE GETQuestionnaire(IN question_id INT)
+BEGIN
+	SELECT *
+	FROM Question q
+	INNER JOIN 
+	Questionnaire qn
+	on q.questionnaire_id = qn.id
+	WHERE qn.id = question_id;
+END //
+     
+delimiter ;
+
+
 
 
 

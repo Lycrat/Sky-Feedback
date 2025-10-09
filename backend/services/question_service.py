@@ -1,7 +1,6 @@
 import pymysql
 
 from backend.database.data_access import DataAccess
-from flask import jsonify
 
 #  GET ALL questions of a specific questionnaires
 def get_questions (questionnaire_id):
@@ -29,15 +28,14 @@ def get_question (question_id):
 
 #  ADD question
 def add_question(questionnaire_id, data):
-
     question = data.get('question')
     try:
         data_access = DataAccess()
-        lastrowid = data_access.execute("INSERT INTO Question (question, questionnaire_id) VALUES (%s, %s);",(question, questionnaire_id))
+        lastrowid = data_access.execute("CALL AddQuestion(questionnaire_id, question) VALUES (%s, %s);",(questionnaire_id, question))
         question = get_question(lastrowid)
 
         # Now add the questions to the question table
-        return jsonify({'question': question}), 201
+        return question
     except Exception as e:
         raise e
 
@@ -45,25 +43,19 @@ def add_question(questionnaire_id, data):
 def delete_question(question_id):
     try:
         data_access = DataAccess()
-        rowid = data_access.execute("DELETE FROM Question WHERE id = (%s);", question_id)
-        question = get_question(rowid)
-
-        return jsonify({'question': question}), 201
+        data_access.execute("DELETE FROM Question WHERE id = (%s);", question_id)
+        return True
     except Exception as e:
         raise e
         
 def update_question(question_id, data):
-
-    if 'question' not in data:
-        raise ValueError("Missing required field: 'question'")
-
     question = data['question']
 
     data_access = DataAccess()
     rowid = data_access.execute("UPDATE Question SET question=(%s) WHERE id = (%s);",(question, question_id))
-    question = get_question(rowid)
+    updated_question = get_question(rowid)
 
-    return question
+    return updated_question
 
 
 
