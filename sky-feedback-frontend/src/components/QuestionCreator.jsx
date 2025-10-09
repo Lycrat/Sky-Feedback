@@ -1,11 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TextField, Button, MenuItem, IconButton, Radio } from "@mui/material";
 import { Delete, Add } from "@mui/icons-material";
 
-export const QuestionCreator = () => {
+export const QuestionCreator = ({ onQuestionChange }) => {
   const [questions, setQuestions] = useState([
     { id: Date.now(), text: "", type: "textarea", options: [] },
   ]);
+
+    useEffect(() => {
+    if (onQuestionChange) {
+      onQuestionChange(questions);
+    }
+  }, [questions]);
 
   const addQuestion = () => {
     setQuestions((prev) => [
@@ -36,7 +42,7 @@ export const QuestionCreator = () => {
     setQuestions((prev) =>
       prev.map((q) =>
         q.id === qId
-          ? { ...q, options: [...(q.options || []), `Option ${q.options.length + 1}`] }
+          ? { ...q, options: [...q.options, ''] }
           : q
       )
     );
@@ -67,6 +73,7 @@ export const QuestionCreator = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen min-w-screen bg-gray-50">
+        {console.log(questions)}
       <div className="flex flex-col justify-center items-center w-[80%] bg-gray-100 rounded-2xl p-8 border border-gray-200 overflow-y-auto padding-top-10 padding-bottom-10">
 
         {!questions ||
