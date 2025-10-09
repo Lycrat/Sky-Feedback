@@ -24,15 +24,15 @@ def get_feedbacks_by_user_id(user_id):
     # Convert to a dictionary for easier consumption
     return user_feedbacks
 
-def get_feedbacks_by_question_id(question_id):
+def get_feedback_by_question_id(question_id):
     data_access = DataAccess()
     try:
-        question_feedbacks = data_access.query("SELECT id, user_id, feedback FROM Feedback WHERE id=%s", question_id)
+        question_feedback = data_access.query("SELECT id, user_id, feedback FROM Feedback WHERE id=%s", question_id)
     except pymysql.MySQLError as e:
         raise RuntimeError(f'Database query error: {e}')
 
     # Convert to a dictionary for easier consumption
-    return question_feedbacks
+    return question_feedback[0]
 
 #  GET a specific user
 def get_feedback(feedback_id):

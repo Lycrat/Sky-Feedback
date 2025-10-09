@@ -18,7 +18,7 @@ def get_questionnaire (questionnaire_id):
     try:
         questionnaire = data_access.query("SELECT id, title, created_at FROM Questionnaire WHERE id = %s", questionnaire_id)
     #      To add a stored procedure to return all the questions of the questionnaire as well
-        details = data_acces.query("CALL GETQuestionnaire(%s);", questionnaire_id)
+        details = data_access.query("CALL GETQuestionnaire(%s);", questionnaire_id)
     except pymysql.MySQLError as e:
         raise RuntimeError(f'Database query error: {e}')
 
@@ -31,12 +31,18 @@ def create_questionnaire(data):
 
     try:
         data_access = DataAccess()
-        lastrowid = data_access.execute("CALL AddQuestionnaire (%s);", questionnaire_title)
-        questionnaire = get_questionnaire(lastrowid)
+        data_access.execute("CALL AddQuestionnaire (%s);", questionnaire_title)
+
+        # Retrieve the newly created questionnaire
+        questionnaire = data_access.query("SELECT id, title, created_at FROM Questionnaire WHERE title = %s ORDER BY created_at DESC LIMIT 1;", questionnaire_title)
+
+        lastrowid = questionnaire[0]['id']
 
         # Add the questions to the question table
         for item in questions_list:
             add_question(lastrowid, item)
+
+        questionnaire = get_questionnaire(lastrowid)
 
         return questionnaire
     except Exception as e:

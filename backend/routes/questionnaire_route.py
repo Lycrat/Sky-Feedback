@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from backend.services import questionnaire_service
 from backend.services import question_service
+from backend.services import feedback_service
 
 # prefix with /api
 questionnaire_bp = Blueprint('questionnaire', __name__, url_prefix='/api/questionnaire')
@@ -25,11 +26,12 @@ def get_questionnaires():
 def add_questionnaire():
     data = request.get_json()
     title = data.get('title')
+
     if not title:
         return jsonify({"error": "Title is required"}), 400
     
     try:
-        new_questionnaire = questionnaire_service.create_questionnaire(title)
+        new_questionnaire = questionnaire_service.create_questionnaire(data)
         return jsonify(new_questionnaire), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -123,3 +125,30 @@ def delete_question(questionnaire_id, question_id):
         return jsonify({"message": "Question deleted successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+# create feedback route
+@questionnaire_bp.route(
+    '/<int:questionnaire_id>/question/<int:question_id>/feedback', methods=['POST'])
+def add_feedback(questionnaire_id, question_id):
+    # get the user id
+    data = request.get_json()
+    user_id = data.get('user_id')
+    feedback_text = data.get('feedback')
+    if not user_id or not feedback_text:
+        return jsonify({"error": "User ID and feedback text are required"}), 400
+    
+    try:
+        new_feedback = feedback_service.add_feedback(user_id, question_id, feedback_text)
+        return jsonify(new_feedback), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@questionnaire_bp.route(
+    '/<int:questionnaire_id>/question/<int:question_id>/feedback', methods=['GET'])
+def get_feedback(questionnaire_id, question_id):
+    try:
+        feedback = feedback_service.get_feedback_by_question_id(question_id)
+        return jsonify(feedback), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    

@@ -27,12 +27,13 @@ def get_question (question_id):
 
 
 #  ADD question
-def add_question(questionnaire_id, data):
-    question = data.get('question')
+def add_question(questionnaire_id, question):
     try:
         data_access = DataAccess()
-        lastrowid = data_access.execute("CALL AddQuestion(questionnaire_id, question) VALUES (%s, %s);",(questionnaire_id, question))
-        question = get_question(lastrowid)
+        data_access.execute("CALL AddQuestion(%s, %s);",(questionnaire_id, question))
+
+        # Retrieve the newly created question
+        question = data_access.query("SELECT id FROM Question WHERE question = %s AND questionnaire_id = %s ORDER BY id DESC LIMIT 1;", (question, questionnaire_id))
 
         # Now add the questions to the question table
         return question

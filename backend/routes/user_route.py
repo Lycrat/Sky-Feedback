@@ -13,7 +13,7 @@ def create_user():
         return jsonify({"error": "Username and email are required"}), 400
     
     try:
-        new_user = user_service.add_user(data)
+        new_user = user_service.add_user(username, name)
         return jsonify(new_user), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500

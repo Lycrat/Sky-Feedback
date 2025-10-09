@@ -22,7 +22,7 @@ CREATE TABLE Question (
   FOREIGN KEY (questionnaire_id) REFERENCES Questionnaire (id)
 );
 
-CREATE TABLE User (
+CREATE TABLE Users (
   id INT AUTO_INCREMENT,
   username VARCHAR(100) NOT NULL,
   name VARCHAR(100) NOT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE Feedback (
   feedback TEXT NOT NULL, 
   PRIMARY KEY (id),
   FOREIGN KEY (question_id) REFERENCES Question(id),
-  FOREIGN KEY (user_id) REFERENCES User(id)
+  FOREIGN KEY (user_id) REFERENCES Users(id)
 );
 
 
