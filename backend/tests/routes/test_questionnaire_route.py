@@ -23,8 +23,17 @@ def mock_services(monkeypatch):
 
     # Mock get_questionnaire_by_id
     def mock_get_questionnaire_by_id(questionnaire_id):
-        return {"id": questionnaire_id, "title": "Mocked Questionnaire", "created_at": "2024-01-01T00:00:00"}
-
+        # return a questionnaire and questions as well
+        return {
+            "id": questionnaire_id,
+            "title": "Mocked Questionnaire",
+            "created_at": "2024-01-01T00:00:00",
+            "questions": [
+                {"id": 1, "questionnaire_id": questionnaire_id, "question": "How satisfied are you with our service?"},
+                {"id": 2, "questionnaire_id": questionnaire_id, "question": "Would you recommend us to others?"},
+            ]
+        }
+    
     # Mock add_questionnaire
     def mock_add_questionnaire(title):
         return {"id": 99, "title": title, "created_at": "2024-01-01T00:00:00"}
@@ -56,6 +65,21 @@ def test_get_questionnaires(client, mock_services):
         assert "id" in questionnaire
         assert "title" in questionnaire
         assert "created_at" in questionnaire
+
+def test_get_questionnaire(client, mock_services):
+    response = client.get("/api/questionnaire/1")
+    assert response.status_code == 200
+    assert "id" in response.json
+    assert response.json["id"] == 1
+    assert "title" in response.json
+    assert "created_at" in response.json
+    assert "questions" in response.json
+    assert isinstance(response.json["questions"], list)
+    for question in response.json["questions"]:
+        assert "id" in question
+        assert "questionnaire_id" in question
+        assert question["questionnaire_id"] == 1
+        assert "question" in question
 
 
 def test_add_questionnaire(client, mock_services):
