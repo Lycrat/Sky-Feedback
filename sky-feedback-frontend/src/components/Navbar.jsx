@@ -4,7 +4,7 @@ const Navbar = () => {
   return (
     <div
       data-testid="navbar"
-      className="w-full max-h-20 flex justify-center items-center p-5 bg-white shadow-lg border-1"
+      className="fixed w-full max-h-20 flex justify-center items-center p-5 bg-white shadow-lg border-1 z-100"
     >
       <img src={skyLogo} className="h-full w-20" />
     </div>
