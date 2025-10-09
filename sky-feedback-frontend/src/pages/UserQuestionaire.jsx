@@ -24,6 +24,10 @@ const UserQuestionaire = () => {
     }));
   };
 
+  const onSubmit = (e) => {
+    e.preventDefault();
+  };
+
   const TextInput = ({ label, placeholder = "e.g. mrRobot", name }) => {
     return (
       <>
