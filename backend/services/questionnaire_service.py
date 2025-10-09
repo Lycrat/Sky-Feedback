@@ -1,11 +1,11 @@
 import pymysql
 
-from db.data_access import DataAccess
+from backend.database.data_access import DataAccess
 from flask import jsonify
 
 
 #  GET ALL questionnaires
-def questionnaires():
+def get_questionnaires():
     try:
         data_access = DataAccess()
         questionnaires = data_access.query("SELECT id, title, created_at FROM Questionnaire ORDER BY created_at DESC;")
@@ -21,11 +21,11 @@ def get_questionnaire (questionnaire_id):
     except pymysql.MySQLError as e:
         raise RuntimeError(f'Database query error: {e}')
 
-    if not result:
+    if not questionnaire:
         return None
 
     # Convert to a dictionary for easier consumption
-    return result[0]
+    return questionnaire[0]
 
 #  CREATE questionnaire
 def create_questionnaire(data):
@@ -57,18 +57,18 @@ def delete_questionnaire(data):
 
     try:
         data_access = DataAccess()
-        questionnaire = data_access.query("DELETE  FROM Questionnaire WHERE id = (%s);",(questionnaire_id))
+        questionnaire = data_access.query("DELETE FROM Questionnaire WHERE id = (%s);",(questionnaire_id))
 
         return jsonify({'title': questionnaire_title}), 201
     except Exception as e:
         raise e
-        
+
 def update_questionnaire(data):
     # 'id' is required; other fields are optional
     if 'questionnaire_id' not in data:
         raise ValueError("Missing required field: 'questionnaire_id'")
 
-     if 'question_id' not in data:
+    if 'question_id' not in data:
         raise ValueError("Missing required field: 'question_id'")
 
     questionnaire_id = data['questionnaire_id']
@@ -79,18 +79,11 @@ def update_questionnaire(data):
         set_clauses.append("title = %s")
         params.append(data['title'])
 
-    if not set_clauses:
-        raise ValueError("No updatable fields provided")
-
-    params.append(questionnaire_id)
-    update_query = f"UPDATE Questionnaire SET {', '.join(set_clauses)} WHERE id = %s"
-
-    dao = DataAccess()
-    dao.execute(update_query, params)
+    data_access = DataAccess()
+    update_query = data_access.execute("UPDATE Questionnaire SET title= (%s) WHERE id = (%s);",(title, questionnaire_id))
 
     # Update the questions
 
-    # 
 
     return get_questionnaire(questionnaire_id)
 
