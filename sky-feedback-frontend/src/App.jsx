@@ -2,14 +2,18 @@ import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { Layout } from "./components";
 import { UserQuestionaire } from "./pages";
+import QuestionCreator from "./components/QuestionCreator";
+import HomeDashboard from "./pages/HomeDashboard";
+
 function App() {
   return (
     <>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route index element={<h1>PUT HOME DASHBOARD HERE</h1>} />
-            <Route path="/questionaire/:id" element={<UserQuestionaire />} />
+            <Route index element={<HomeDashboard />} />
+            <Route path="/questionnaire/:id" element={<UserQuestionaire />} />
+            <Route path="question-creator" element={<QuestionCreator />} />
           </Route>
         </Routes>
       </BrowserRouter>
