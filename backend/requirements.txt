@@ -2,3 +2,4 @@ flask
 pytest
 pymysql
 python-dotenv
+flask-cors
