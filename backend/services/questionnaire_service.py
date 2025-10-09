@@ -1,6 +1,7 @@
 import pymysql
 
 from backend.database.data_access import DataAccess
+from backend.services.question_service import add_question
 from flask import jsonify
 
 
@@ -17,7 +18,9 @@ def get_questionnaires():
 def get_questionnaire (questionnaire_id):
     data_access = DataAccess()
     try:
-        questionnaire = data_access.query("SELECT id, title, created_at FROM Questionnaire WHERE id = %s", (questionnaire_id))
+        questionnaire = data_access.query("SELECT id, title, created_at FROM Questionnaire WHERE id = %s", questionnaire_id)
+    #      To add a stored procedure to return all the questions of the questionnaire as well
+
     except pymysql.MySQLError as e:
         raise RuntimeError(f'Database query error: {e}')
 
@@ -40,11 +43,14 @@ def create_questionnaire(data):
 
     try:
         data_access = DataAccess()
-        lastrowid = data_access.execute("INSERT INTO Questionnaire (title) VALUES (%s);",(questionnaire_title))
+        lastrowid = data_access.execute("INSERT INTO Questionnaire (title) VALUES (%s);",questionnaire_title)
         questionnaire = get_questionnaire(lastrowid)
 
-        # Now add the questions to the question table
-        return jsonify({'title': questionnaire_title}), 201
+        # Add the questions to the question table
+        for item in questions_list:
+            add_question(lastrowid, item)
+
+        return jsonify({'questionnaire': questionnaire}), 201
     except Exception as e:
         raise e
 
@@ -57,7 +63,7 @@ def delete_questionnaire(data):
 
     try:
         data_access = DataAccess()
-        questionnaire = data_access.query("DELETE FROM Questionnaire WHERE id = (%s);",(questionnaire_id))
+        questionnaire = data_access.execute("DELETE FROM Questionnaire WHERE id = (%s);",questionnaire_id)
 
         return jsonify({'title': questionnaire}), 201
     except Exception as e:
@@ -72,12 +78,14 @@ def update_questionnaire(data):
 
     questionnaire_id = data['questionnaire_id']
     title = data['title']
+    to_update_ques_list = data['update_questions']
 
     data_access = DataAccess()
     update_query = data_access.execute("UPDATE Questionnaire SET title= (%s) WHERE id = (%s);",(title, questionnaire_id))
 
-    # Update the questions
-
+    # Update the questions in the question table
+    for item in to_update_ques_list:
+        update_question(lastrowid, item)
 
     return get_questionnaire(questionnaire_id)
 
