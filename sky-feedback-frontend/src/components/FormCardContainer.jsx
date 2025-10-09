@@ -28,7 +28,7 @@ function FormCardContainer ({data}) {
         return (
             <div className="grid [grid-template-columns:repeat(auto-fit,minmax(350px,1fr))] gap-8 p-6 w-full place-items-center">
                 {data.map((item) => (
-                    <FormCard key={item.questionnaire_id} data={item} />
+                    <FormCard key={item.id} data={item} />
                 ))}
             <button
                 type="button"
