@@ -81,8 +81,7 @@ def test_update_questionnaire(client):
     assert put_response.json['title'] == updated_data['title']
 
     # Verify the update
-    get_response = client.get('/api/questionnaire/')
+    get_response = client.get(f'/api/questionnaire/{questionnaire_id}')
     assert get_response.status_code == 200
-    titles = [q['title'] for q in get_response.json if q['id'] == questionnaire_id]
-    assert titles[0] == updated_data['title']
+    assert get_response.json["title"] == updated_data['title']
 
