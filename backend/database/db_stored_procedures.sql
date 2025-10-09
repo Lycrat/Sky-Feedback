@@ -9,7 +9,7 @@ BEGIN
 	INSERT INTO Questionnaire(title) values (title);
 END //
      
-delimiter ;
+
 
 delimiter //
 CREATE PROCEDURE UpdateQuestionnaire(IN ques_id INT, IN ques_title VARCHAR(100))
@@ -19,7 +19,7 @@ BEGIN
     WHERE id = ques_id;
 END //
      
-delimiter ;
+
 
 -- ADD and UPDATE Question
 delimiter //
@@ -29,7 +29,7 @@ BEGIN
 	INSERT INTO Question(questionnaire_id, question) values (questionnaire_id, question);
 END //
      
-delimiter ;
+
 
 delimiter //
 CREATE PROCEDURE UpdateQuestion(IN QuestionnaireID INT, IN QID INT, IN ques_title VARCHAR(100))
@@ -39,7 +39,7 @@ BEGIN
     WHERE id = QID;
 END //
      
-delimiter ;
+
 
 -- ADD Feedback
 delimiter //
@@ -49,7 +49,7 @@ BEGIN
 	INSERT INTO Feedback(question_id, user_id, feedback) values (question_id, user_id, feedback);
 END //
      
-delimiter ;
+
 
 delimiter //
 
@@ -60,7 +60,7 @@ BEGIN
 	INSERT INTO Users(username, name) values (username, name);
 END //
      
-delimiter ;
+
 
 
 delimiter //
@@ -77,7 +77,7 @@ BEGIN
 	WHERE qn.id = question_id;
 END //
      
-delimiter ;
+
 
 
 
