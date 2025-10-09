@@ -3,9 +3,9 @@ import { Navbar, Footer } from "./";
 import { Outlet } from "react-router";
 const Layout = () => {
   return (
-    <div className="w-full h-auto">
+    <div className="flex flex-col w-full min-h-screen">
       <Navbar />
-      <main className="pt-20 w-full h-full">
+      <main className="pt-20 w-full h-full flex-grow" role="main div">
         <Outlet />
       </main>
       <Footer />
