@@ -1,6 +1,6 @@
 import pymysql
 
-from backend.database.data_access import DataAccess
+from database.data_access import DataAccess
 
 #  GET ALL Users
 def get_users():

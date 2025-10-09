@@ -1,6 +1,6 @@
 import flask
-from backend.routes.questionnaire_route import questionnaire_bp
-from backend.routes.user_route import user_bp
+from routes.questionnaire_route import questionnaire_bp
+from routes.user_route import user_bp
 
 def create_app():
     # Initialize the Flask application

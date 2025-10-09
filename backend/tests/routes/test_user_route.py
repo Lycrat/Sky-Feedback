@@ -1,7 +1,7 @@
 import pytest
 
-from backend.app import create_app
-from backend.services import user_service
+from app import create_app
+from services import user_service
 
 @pytest.fixture
 def app():

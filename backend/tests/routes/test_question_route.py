@@ -1,6 +1,6 @@
 import pytest
 
-from backend.app import create_app
+from app import create_app
 
 @pytest.fixture
 def app():
@@ -42,7 +42,7 @@ def mock_services(monkeypatch):
         return {"message": "Question deleted successfully"}
     
     # Apply monkeypatches
-    import backend.services.question_service as service
+    import services.question_service as service
     monkeypatch.setattr(service, "get_questions", mock_get_questions)
     monkeypatch.setattr(service, "get_question", mock_get_question_by_id)
     monkeypatch.setattr(service, "add_question", mock_add_question)

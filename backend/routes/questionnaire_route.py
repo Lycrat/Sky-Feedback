@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
-from backend.services import questionnaire_service
-from backend.services import question_service
-from backend.services import feedback_service
+from services import questionnaire_service
+from services import question_service
+from services import feedback_service
 
 # prefix with /api
 questionnaire_bp = Blueprint('questionnaire', __name__, url_prefix='/api/questionnaire')
