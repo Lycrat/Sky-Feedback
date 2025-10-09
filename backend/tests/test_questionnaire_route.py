@@ -1,5 +1,5 @@
 import pytest
-from app import create_app
+from backend.app import create_app
 
 # Make app a proper pytest fixture
 @pytest.fixture
