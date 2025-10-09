@@ -1,6 +1,6 @@
 import pymysql
 import os
-import dotenv
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -14,10 +14,10 @@ class DataAccess:
         if not self.__connection or not self.__connection.open:
             try:
                 self.__connection = pymysql.connect(
-                    host=os.getenv(DB_HOST),
-                    user=os.getenv(DB_USER),
-                    db=os.getenv(DB_NAME),
-                    password=os.getenv(DB_PASSWORD),
+                    host=os.getenv("DB_HOST"),
+                    user=os.getenv("DB_USER"),
+                    db=os.getenv("DB_NAME"),
+                    password=os.getenv("DB_PASSWORD"),
                     cursorclass=pymysql.cursors.DictCursor,
                 )
                 self.__cursor = self.__connection.cursor()
