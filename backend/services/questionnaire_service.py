@@ -59,12 +59,11 @@ def delete_questionnaire(data):
         data_access = DataAccess()
         questionnaire = data_access.query("DELETE FROM Questionnaire WHERE id = (%s);",(questionnaire_id))
 
-        return jsonify({'title': questionnaire_title}), 201
+        return jsonify({'title': questionnaire}), 201
     except Exception as e:
         raise e
 
 def update_questionnaire(data):
-    # 'id' is required; other fields are optional
     if 'questionnaire_id' not in data:
         raise ValueError("Missing required field: 'questionnaire_id'")
 
@@ -72,12 +71,7 @@ def update_questionnaire(data):
         raise ValueError("Missing required field: 'question_id'")
 
     questionnaire_id = data['questionnaire_id']
-    set_clauses = []
-    params = []
-
-    if 'title' in data:
-        set_clauses.append("title = %s")
-        params.append(data['title'])
+    title = data['title']
 
     data_access = DataAccess()
     update_query = data_access.execute("UPDATE Questionnaire SET title= (%s) WHERE id = (%s);",(title, questionnaire_id))
