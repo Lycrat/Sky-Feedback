@@ -18,14 +18,11 @@ def get_questionnaire (questionnaire_id):
     try:
         questionnaire = data_access.query("SELECT id, title, created_at FROM Questionnaire WHERE id = %s", questionnaire_id)
     #      To add a stored procedure to return all the questions of the questionnaire as well
-
+        details = data_acces.query("CALL GETQuestionnaire(%s);", questionnaire_id)
     except pymysql.MySQLError as e:
         raise RuntimeError(f'Database query error: {e}')
 
-    if not questionnaire:
-        return None
-
-    return questionnaire[0]
+    return {"questionnaire": questionnaire, "questions": details}
 
 #  CREATE questionnaire
 def create_questionnaire(data):
