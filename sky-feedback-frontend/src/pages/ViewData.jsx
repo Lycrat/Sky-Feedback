@@ -15,13 +15,35 @@ export const ViewData = ({ id, userId }) => {
     { question: "how are you?", answer: "fine mate and you" },
   ]);
   const [loading, setLoading] = useState(true);
-  const [selectedUser, setSelectedUser] = useState("Panya");
+  const [userList, setUserList] = useState(null);
+  const [selectedUser, setSelectedUser] = useState("None");
 
   useEffect(() => {
-    const handleFetchData = async () => {
+    const handleFetchAllUsers = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/user/`);
+        if (response.status == 200) {
+          console.log("successful");
+          console.log(response);
+          const data = response.data;
+          setUserList(data);
+          const firstUser = data[0].name;
+          setSelectedUser(firstUser);
+        } else {
+          console.error("unsuccessful");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    handleFetchAllUsers();
+  }, []);
+
+  useEffect(() => {
+    const handleFetchUserData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/${id}/${userId}`
+          `http://localhost:5000/${id}/${userId}/`
         );
         if (response.status === 200) {
           setData(response.data);
@@ -36,7 +58,7 @@ export const ViewData = ({ id, userId }) => {
       }
     };
 
-    handleFetchData();
+    handleFetchUserData();
   }, [id]);
 
   const handleUserSelection = (e) => {
@@ -78,10 +100,16 @@ export const ViewData = ({ id, userId }) => {
             label="Selected User"
             onChange={(e) => handleUserSelection(e.target.value)}
           >
-            <MenuItem value="Panya">Panya</MenuItem>
+            {userList &&
+              userList.length > 0 &&
+              userList.map((u, idx) => {
+                const user_name = u.name;
+                return <MenuItem value={user_name}>{user_name}</MenuItem>;
+              })}
+            {/* <MenuItem value="Panya">Panya</MenuItem>
             <MenuItem value="Daveraj">Daveraj</MenuItem>
             <MenuItem value="Saranya">Saranya</MenuItem>
-            <MenuItem value="Maks">Maks</MenuItem>
+            <MenuItem value="Maks">Maks</MenuItem> */}
           </Select>
         </FormControl>
       </div>
