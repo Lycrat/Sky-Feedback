@@ -113,7 +113,7 @@ def update_question(questionnaire_id, question_id):
         return jsonify({"error": "Question text is required"}), 400
     
     try:
-        updated_question = question_service.update_question(question_id, question_text)
+        updated_question = question_service.update_question(questionnaire_id, question_id, data)
         return jsonify(updated_question), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
