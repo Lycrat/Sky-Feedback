@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from backend.services.question_service import (get_questions,
                                                get_question,
