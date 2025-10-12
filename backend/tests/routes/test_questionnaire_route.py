@@ -47,7 +47,7 @@ def mock_services(monkeypatch):
         return True
 
     # Apply monkeypatches
-    import services.questionnaire_service as service
+    import backend.services.questionnaire_service as service
     monkeypatch.setattr(service, "get_questionnaires", mock_get_all_questionnaires)
     monkeypatch.setattr(service, "get_questionnaire", mock_get_questionnaire_by_id)
     monkeypatch.setattr(service, "create_questionnaire", mock_add_questionnaire)

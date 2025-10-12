@@ -52,7 +52,7 @@ def update_questionnaire(questionnaire_id):
         return jsonify({"error": "Title is required"}), 400
 
     try:
-        updated_questionnaire = questionnaire_service.update_questionnaire(questionnaire_id, title)
+        updated_questionnaire = questionnaire_service.update_questionnaire(questionnaire_id, data)
         return jsonify(updated_questionnaire), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500

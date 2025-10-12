@@ -2,10 +2,10 @@ CREATE database skyfeedbackdb;
 
 use skyfeedbackdb;
 
-DROP TABLE Questionnaire;
-DROP TABLE Question;
-DROP TABLE User;
 DROP TABLE Feedback;
+DROP TABLE User;
+DROP TABLE Question;
+DROP TABLE Questionnaire;
 
 CREATE TABLE Questionnaire (
   id INT AUTO_INCREMENT,
@@ -19,10 +19,10 @@ CREATE TABLE Question (
   questionnaire_id INT NOT NULL,
   question VARCHAR(200) NOT NULL,
   PRIMARY KEY (id),
-  FOREIGN KEY (questionnaire_id) REFERENCES Questionnaire (id)
+  FOREIGN KEY (questionnaire_id) REFERENCES Questionnaire (id) ON DELETE CASCADE
 );
 
-CREATE TABLE Users (
+CREATE TABLE User (
   id INT AUTO_INCREMENT,
   username VARCHAR(100) NOT NULL,
   name VARCHAR(100) NOT NULL,
@@ -35,8 +35,8 @@ CREATE TABLE Feedback (
   user_id INT NOT NULL,
   feedback TEXT NOT NULL, 
   PRIMARY KEY (id),
-  FOREIGN KEY (question_id) REFERENCES Question(id),
-  FOREIGN KEY (user_id) REFERENCES Users(id)
+  FOREIGN KEY (question_id) REFERENCES Question(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE
 );
 
 
