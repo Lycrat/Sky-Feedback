@@ -34,7 +34,7 @@ def create_questionnaire(data):
         data_access = DataAccess()
         # Use the stored procedure to add the questionnaire and get the last inserted 
         data_access.callproc('AddQuestionnaire', (questionnaire_title,))
-        lastrowid = data_access.getlastrowid_for_callproc()
+        last_row_id = data_access.get_lastrowid_for_callproc()
 
         # # Retrieve the newly created questionnaire
         # questionnaire = data_access.query("SELECT id, title, created_at FROM Questionnaire WHERE title = %s ORDER BY created_at DESC LIMIT 1;", questionnaire_title)
@@ -43,9 +43,9 @@ def create_questionnaire(data):
 
         # Add the questions to the question table
         for item in questions_list:
-            add_question(lastrowid, item)
+            add_question(last_row_id, item)
 
-        questionnaire = get_questionnaire(lastrowid)
+        questionnaire = get_questionnaire(last_row_id)
 
         return questionnaire
     except Exception as e:

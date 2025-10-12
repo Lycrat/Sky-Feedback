@@ -68,10 +68,10 @@ class DataAccess:
             self.__connection.rollback()
             raise RuntimeError(f"Database query execution failed: {e}")
 
-    def getlastrowid_for_callproc(self):
+    def get_lastrowid_for_callproc(self):
         try:
-            returned_result = self.__cursor.execute("SELECT LAST_INSERT_ID();")
-            lastrowid = self.__cursor.fetchone()['LAST_INSERT_ID()']
-            return lastrowid
+            self.__cursor.execute("SELECT LAST_INSERT_ID();")
+            last_row_id = self.__cursor.fetchone()['LAST_INSERT_ID()']
+            return last_row_id
         except pymysql.MySQLError as e:
             raise RuntimeError(f"Database query execution failed: {e}")

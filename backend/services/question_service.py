@@ -36,10 +36,10 @@ def add_question(questionnaire_id, question):
         # question = data_access.query("SELECT id FROM Question WHERE question = %s AND questionnaire_id = %s ORDER BY id DESC LIMIT 1;", (question, questionnaire_id))
 
         data_access.callproc("AddQuestion", (questionnaire_id, question))
-        lastrowid = data_access.getlastrowid_for_callproc()
+        last_row_id = data_access.get_lastrowid_for_callproc()
 
         # Now add the questions to the question table
-        return get_question(lastrowid)
+        return get_question(last_row_id)
     except Exception as e:
         raise e
 
