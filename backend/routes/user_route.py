@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from backend.services import user_service
+from services import user_service
 
 # prefix with /api
 user_bp = Blueprint('user', __name__, url_prefix='/api/user')

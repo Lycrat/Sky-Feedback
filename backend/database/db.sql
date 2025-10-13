@@ -1,12 +1,6 @@
-DROP database skyfeedbackdb;
 CREATE database skyfeedbackdb;
 
 use skyfeedbackdb;
-
-DROP TABLE Feedback;
-DROP TABLE Users;
-DROP TABLE Question;
-DROP TABLE Questionnaire;
 
 CREATE TABLE Questionnaire (
   id INT AUTO_INCREMENT,
@@ -25,7 +19,7 @@ CREATE TABLE Question (
 
 CREATE TABLE Users (
   id INT AUTO_INCREMENT,
-  username VARCHAR(100) NOT NULL,
+  username VARCHAR(100) NOT NULL UNIQUE,
   name VARCHAR(100) NOT NULL,
   PRIMARY KEY (id)
 );

@@ -1,6 +1,6 @@
 import pymysql
 
-from backend.database.data_access import DataAccess
+from database.data_access import DataAccess
 
 #  GET ALL questions of a specific questionnaires
 def get_questions (questionnaire_id):

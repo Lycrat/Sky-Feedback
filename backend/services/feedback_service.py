@@ -1,6 +1,6 @@
 import pymysql
 
-from backend.database.data_access import DataAccess
+from database.data_access import DataAccess
 
 
 #  GET ALL Feedbacks
@@ -50,7 +50,7 @@ def get_feedback(feedback_id):
 def add_feedback(user_id, question_id, feedback):
     try:
         data_access = DataAccess()
-        # lastrowid = data_access.execute("INSERT INTO User (user_id, question_id, feedback) VALUES (%s, %s, %s);",
+        # lastrowid = data_access.execute("INSERT INTO Users (user_id, question_id, feedback) VALUES (%s, %s, %s);",
         #                                 (user_id, question_id, feedback))
         # feedback = get_feedback(lastrowid)
         data_access.callproc("AddFeedback",(user_id,question_id,feedback))
