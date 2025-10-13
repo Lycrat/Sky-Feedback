@@ -16,7 +16,7 @@ class TestQuestionService(unittest.TestCase):
     @patch(DATA_ACCESS_PATH)
     def test_get_questions_success(self, mock_data_access):
         mock_instance = mock_data_access.return_value
-    mock_instance.query.return_value = [{'id': 1, 'questionnaire_id': 101, 'question': 'What is your name?', 'type': 'text'},
+        mock_instance.query.return_value = [{'id': 1, 'questionnaire_id': 101, 'question': 'What is your name?', 'type': 'text'},
                          {'id': 2, 'questionnaire_id': 101, 'question': 'How old are you?', 'type': 'text'}]
 
         result = get_questions(101)
@@ -30,21 +30,21 @@ class TestQuestionService(unittest.TestCase):
     @patch(DATA_ACCESS_PATH)
     def test_get_question_success(self, mock_data_access):
         mock_instance = mock_data_access.return_value
-    mock_instance.query.return_value = {'id': 1, 'questionnaire_id': 101, 'question': 'What is your name?', 'type': 'text'}
+        mock_instance.query.return_value = {'id': 1, 'questionnaire_id': 101, 'question': 'What is your name?', 'type': 'text'}
 
         result = get_question(1)
-    assert result == {'id': 1, 'questionnaire_id': 101, 'question': 'What is your name?', 'type': 'text', 'options': []}
+        assert result == {'id': 1, 'questionnaire_id': 101, 'question': 'What is your name?', 'type': 'text', 'options': []}
 
     # Test add_question
     @patch(DATA_ACCESS_PATH)
     def test_add_question_success(self, mock_data_access):
         mock_instance = mock_data_access.return_value
-    mock_instance.query.return_value = {'id': 4, 'questionnaire_id': 101, 'question': "What is your favorite color?", 'type': 'text'}
+        mock_instance.query.return_value = {'id': 4, 'questionnaire_id': 101, 'question': "What is your favorite color?", 'type': 'text'}
 
-    result = add_question(101, "What is your favorite color?")
+        result = add_question(101, "What is your favorite color?")
 
-    mock_instance.callproc.assert_called_once_with("AddQuestion", (101, "What is your favorite color?", 'text'))
-    assert result == {'id': 4, 'questionnaire_id': 101, 'question': "What is your favorite color?", 'type': 'text', 'options': []}
+        mock_instance.callproc.assert_called_once_with("AddQuestion", (101, "What is your favorite color?", 'text'))
+        assert result == {'id': 4, 'questionnaire_id': 101, 'question': "What is your favorite color?", 'type': 'text', 'options': []}
 
     # Test delete_question
     @patch(DATA_ACCESS_PATH)
@@ -56,15 +56,17 @@ class TestQuestionService(unittest.TestCase):
         mock_instance.execute.assert_called_once_with("DELETE FROM Question WHERE id = (%s);", 1)
 
     # Test update_question
+    @patch("backend.services.question_service.replace_options")
     @patch('backend.services.question_service.get_question')
     @patch(DATA_ACCESS_PATH)
-    def test_update_question_success(self, mock_data_access, mock_get_question):
+    def test_update_question_success(self, mock_data_access, mock_get_question, mock_replace_options):
 
         mock_instance = mock_data_access.return_value
-    mock_get_question.return_value = {'id': 1, 'questionnaire_id': 101, 'question': 'Updated question', 'type': 'text'}
+        mock_get_question.return_value = {'id': 1, 'questionnaire_id': 101, 'question': 'Updated question', 'type': 'text', 'options': []}
 
-    result = update_question(101, 1, {'question': 'Updated question'})
+        result = update_question(101, 1, {'question': 'Updated question'})
 
+        mock_replace_options.return_value = None
 
-    mock_instance.callproc.assert_called_once_with("UpdateQuestion", (101, 1, "Updated question", 'text'))
-    assert result == {'id': 1, 'questionnaire_id': 101, 'question': 'Updated question', 'type': 'text', 'options': []}
+        mock_instance.callproc.assert_called_once_with("UpdateQuestion", (101, 1, "Updated question", 'text'))
+        assert result == {'id': 1, 'questionnaire_id': 101, 'question': 'Updated question', 'type': 'text', 'options': []}
