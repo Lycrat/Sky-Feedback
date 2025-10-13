@@ -5,7 +5,9 @@ from backend.services.question_service import (get_questions,
                                                get_question,
                                                add_question,
                                                delete_question,
-                                               update_question)
+                                               update_question,
+                                               add_option,
+                                               get_options_by_question_id, replace_options)
 
 
 class TestQuestionService(unittest.TestCase):
@@ -70,3 +72,34 @@ class TestQuestionService(unittest.TestCase):
 
         mock_instance.callproc.assert_called_once_with("UpdateQuestion", (101, 1, "Updated question", 'text'))
         assert result == {'id': 1, 'questionnaire_id': 101, 'question': 'Updated question', 'type': 'text', 'options': []}
+
+
+    @patch(DATA_ACCESS_PATH)
+    def test_add_option_success(self, mock_data_access):
+        mock_instance = mock_data_access.return_value
+        mock_instance.query.return_value = None
+
+        add_option(1, "Option1")
+        mock_instance.callproc.assert_called_once_with("AddOption", (1, "Option1"))
+
+
+    @patch(DATA_ACCESS_PATH)
+    def test_get_options_by_id(self, mock_data_access):
+        mock_instance = mock_data_access.return_value
+        mock_instance.query.return_value = [{"id":1, "question_id":1, "option_text":"Option 1"},
+                                            {"id":2, "question_id":1, "option_text":"Option 2"}]
+
+        get_options_by_question_id(1)
+        mock_instance.query.assert_called_once_with("SELECT id, option_text FROM Options WHERE question_id = %s ORDER BY id ASC", 1)
+
+    @patch('backend.services.question_service.add_option')
+    @patch(DATA_ACCESS_PATH)
+    def test_replace_options_success(self, mock_data_access, mock_add_option):
+        mock_instance = mock_data_access.return_value
+        mock_instance.query.return_value = None
+
+        replace_options(1, ["Option1", "Option2"])
+
+        mock_instance.callproc.assert_called_once_with("DeleteOptionsForQuestion", (1,))
+        # Check if the mock_add_option is called 2 times
+        # assert mock_add_option.query.call_count == 2
