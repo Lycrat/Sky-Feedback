@@ -37,7 +37,7 @@ CREATE TABLE Feedback (
   feedback TEXT NOT NULL, 
   PRIMARY KEY (id),
   FOREIGN KEY (question_id) REFERENCES Question(id) ON DELETE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE
+  FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
 );
 
 
