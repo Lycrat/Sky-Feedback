@@ -53,7 +53,7 @@ def add_feedback(user_id, question_id, feedback):
         # lastrowid = data_access.execute("INSERT INTO Users (user_id, question_id, feedback) VALUES (%s, %s, %s);",
         #                                 (user_id, question_id, feedback))
         # feedback = get_feedback(lastrowid)
-        data_access.callproc("AddFeedback",(user_id,question_id,feedback))
+        data_access.callproc("AddFeedback",(question_id,user_id,feedback))
         last_row_id = data_access.get_lastrowid_for_callproc()
 
         feedback = get_feedback(last_row_id)
