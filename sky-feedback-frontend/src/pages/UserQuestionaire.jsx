@@ -1,6 +1,7 @@
 import React, { useEffect, useState, Fragment } from "react";
 import { useParams } from "react-router";
 import axios from "axios";
+import { useNavigate } from "react-router";
 
 const TextInput = ({ label, placeholder = "e.g. mrRobot", name, value }) => {
   return (
@@ -22,6 +23,9 @@ const UserQuestionaire = () => {
   const [answers, setAnswers] = useState([]);
   const { id } = useParams();
   const [questions, setQuestions] = useState();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -33,8 +37,6 @@ const UserQuestionaire = () => {
         console.log(err);
       });
   }, [answers]);
-
-  useEffect(() => {}, [questions]);
 
   const handleChange = (value, dataId) => {
     setAnswers((prev) => {
@@ -51,6 +53,8 @@ const UserQuestionaire = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+
+    setIsLoading(true);
     const username = e.target.username.value;
     const name = e.target.name.value;
 
@@ -58,21 +62,19 @@ const UserQuestionaire = () => {
     // find user id
     console.log(username, name);
     try {
-      const res = await axios.get(
-        "http://localhost:5000/api/user/",
-        {
-          params: {
-            username: "Mr Robot",
-            name: "Panya",
-          },
+      const res = await axios.get("http://localhost:5000/api/user/", {
+        params: {
+          username: "Mr Robot",
+          name: "Panya",
         },
-        {}
-      );
+      });
       if (res.data) {
         user_id = res.data[0].id;
       }
+      console.log(user_id);
     } catch (err) {
       console.log(err);
+    } finally {
     }
 
     // Send feedbacks
@@ -88,8 +90,12 @@ const UserQuestionaire = () => {
         console.log(res.data);
       } catch (err) {
         console.log(err);
+      } finally {
+        setIsLoading(false);
       }
     });
+
+    navigate("/");
   };
 
   const getStoredAnswer = (id) => {
@@ -127,10 +133,10 @@ const UserQuestionaire = () => {
             </Fragment>
           );
         })}
-        <div className="flex flex-row justify-center items-center md:justify-start md:items-start">
+        <div className="flex flex-col justify-center items-center md:justify-start md:items-start">
           <button
             type="submit"
-            className="rounded-lg bg-orange-500 w-50 text-white h-10"
+            className="rounded-lg bg-green-500 w-50 text-white h-10"
           >
             Submit
           </button>
