@@ -8,6 +8,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useParams } from "react-router";
+import DataRow from "../components/DataRow";
 
 export const ViewData = () => {
   const [questions, setQuestions] = useState([]);
@@ -165,23 +166,11 @@ export const ViewData = () => {
             // console.log(answerObj);
 
             return (
-              <div key={index}>
-                <h2 className="text-gray-500 font-bold text-2xl">
-                  {d.question}
-                </h2>
-
-                {answerObj && answerObj.feedback.length > 0 ? (
-                  answerObj.feedback.map((fb, idx) => (
-                    <h3 key={idx} className="text-gray-500 font-light text-xl">
-                      - {fb.feedback}
-                    </h3>
-                  ))
-                ) : (
-                  <h3 className="text-red-300 font-light text-xl">
-                    No feedback yet
-                  </h3>
-                )}
-              </div>
+              <DataRow
+                key={index}
+                answerObj={answerObj}
+                question={d.question}
+              />
             );
           })}
       </div>
