@@ -26,19 +26,18 @@ BEGIN
     WHERE id = ques_id;
 END //
 
--- ADD and UPDATE Question
 delimiter //
 
-CREATE PROCEDURE AddQuestion(IN questionnaire_id INT, IN question VARCHAR(200))
+CREATE PROCEDURE AddQuestion(IN questionnaire_id INT, IN question VARCHAR(200), IN q_type VARCHAR(50))
 BEGIN
-	INSERT INTO Question(questionnaire_id, question) values (questionnaire_id, question);
+	INSERT INTO Question(questionnaire_id, question, type) values (questionnaire_id, question, q_type);
 END //
 
 delimiter //
-CREATE PROCEDURE UpdateQuestion(IN QuestionnaireID INT, IN QID INT, IN ques_title VARCHAR(100))
+CREATE PROCEDURE UpdateQuestion(IN QuestionnaireID INT, IN QID INT, IN ques_title VARCHAR(200), IN q_type VARCHAR(50))
 BEGIN
 	UPDATE Question
-    SET question = ques_title, questionnaire_id = QuestionnaireID
+	SET question = ques_title, questionnaire_id = QuestionnaireID, type = q_type
     WHERE id = QID;
 END //
 
@@ -61,14 +60,34 @@ END //
 
 delimiter //
 
--- 
+-- Question options helpers
+delimiter //
+CREATE PROCEDURE AddOption(IN qid INT, IN opt_text VARCHAR(200))
+BEGIN
+    INSERT INTO Options(question_id, option_text) VALUES (qid, opt_text);
+END //
 
+delimiter //
+CREATE PROCEDURE DeleteOptionsForQuestion(IN qid INT)
+BEGIN
+    DELETE FROM Options WHERE question_id = qid;
+END //
+
+delimiter //
+-- Get questionnaire with questions and types; join options if any
 CREATE PROCEDURE GETQuestionnaire(IN question_id INT)
 BEGIN
-	SELECT *
-	FROM Question q
-	INNER JOIN 
-	Questionnaire qn
-	on q.questionnaire_id = qn.id
-	WHERE qn.id = question_id;
+	SELECT qn.id as questionnaire_id,
+           qn.title,
+           qn.created_at,
+           q.id as question_id,
+           q.question,
+           q.type,
+           o.id as option_id,
+           o.option_text
+	FROM Questionnaire qn
+	LEFT JOIN Question q ON q.questionnaire_id = qn.id
+	LEFT JOIN Options o ON o.question_id = q.id
+	WHERE qn.id = question_id
+	ORDER BY q.id, o.id;
 END //
