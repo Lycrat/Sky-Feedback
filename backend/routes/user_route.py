@@ -31,9 +31,8 @@ def get_user(user_id):
 @user_bp.route('/', methods=['GET'])
 def get_all_users():
     # if username or name is supplied, search by that
-    data = request.get_json()
-    username = data.get('username')
-    name = data.get('name')
+    name = request.args.get('name', None)
+    username = request.args.get('username', None)
     
     try:
         users = user_service.get_users(username=username, name=name)
