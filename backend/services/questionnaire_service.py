@@ -28,7 +28,7 @@ def get_questionnaire (questionnaire_id):
 #  CREATE questionnaire
 def create_questionnaire(data):
     questionnaire_title = data.get('title')
-    questions_list = data.get('questions_list')
+    questions_list = data.get('questions_list', [])
 
     try:
         data_access = DataAccess()
@@ -43,7 +43,12 @@ def create_questionnaire(data):
 
         # Add the questions to the question table
         for item in questions_list:
-            add_question(last_row_id, item)
+            # split question and options if any
+            question_text = item.get('question')
+            question_options = item.get('options', [])
+            question_type = "text" if not question_options else "multiple-choice"
+
+            add_question(last_row_id, question_text, question_options, question_type)
 
         questionnaire = get_questionnaire(last_row_id)
 
@@ -63,17 +68,23 @@ def delete_questionnaire(questionnaire_id):
 
 # UPDATE questionnaire
 def update_questionnaire(questionnaire_id, data):
-
     title = data['title']
-    to_update_ques_list = data['to_update_questions']
+    # get new questions list (with new, updated and deleted questions)
+    new_ques_list = data.get('questions_list', [])
+    # get current questions list from db
+    current_ques_list = get_questionnaire(questionnaire_id).get('questions', [])
 
-    data_access = DataAccess()
-    data_access.callproc('UpdateQuestionnaire', (questionnaire_id, title,))
+    # Determine which questions to add, update, or delete
+    current_ques_dict = {q['id']: q for q in current_ques_list}
+    existing_updated_ques_dict = {q.get('id'): q for q in new_ques_list if q.get('id') is not None}
 
-    # Update the questions in the question table
-    if to_update_ques_list:
-        for item in to_update_ques_list:
-            update_question(item['id'], item)
+    # Questions to delete (present in current but not in new)
+    to_delete = [q_id for q_id in current_ques_dict if q_id not in existing_updated_ques_dict]
+    # Questions to add (present in new but not in current)
+    to_add = [q for q in new_ques_list if q.get('id') is None]
+    # Questions to update (present in both)
+    to_update = [existing_updated_ques_dict[q_id] for q_id in existing_updated_ques_dict if q_id in current_ques_dict]
+
 
     updated_questionnaire = get_questionnaire(questionnaire_id)
 

@@ -88,6 +88,9 @@ def get_questions(questionnaire_id):
 def add_question(questionnaire_id):
     data = request.get_json()
     question_text = data.get('question')
+    question_options = data.get('options', [])
+    question_type = "text" if not question_options else "multiple-choice"
+
     if not question_text:
         return jsonify({"error": "Question text is required"}), 400
     

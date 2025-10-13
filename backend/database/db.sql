@@ -17,6 +17,14 @@ CREATE TABLE Question (
   FOREIGN KEY (questionnaire_id) REFERENCES Questionnaire (id) ON DELETE CASCADE
 );
 
+CREATE TABLE Options (
+  id INT AUTO_INCREMENT,
+  question_id INT NOT NULL,
+  option_text VARCHAR(200) NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (question_id) REFERENCES Question(id) ON DELETE CASCADE
+);
+
 CREATE TABLE Users (
   id INT AUTO_INCREMENT,
   username VARCHAR(100) NOT NULL UNIQUE,
