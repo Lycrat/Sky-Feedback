@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { TextField, Button, MenuItem, IconButton, Radio } from "@mui/material";
 import { Delete, Add } from "@mui/icons-material";
 
-export const QuestionCreator = ({ onQuestionChange }) => {
-  const [questions, setQuestions] = useState([
+export const QuestionCreator = ({ onQuestionChange, initialQuestions }) => {
+  const [questions, setQuestions] = useState(
+    initialQuestions && initialQuestions.length > 0 ? initialQuestions : [
     { id: Date.now(), text: "", type: "textarea", options: [] },
   ]);
 
@@ -71,9 +72,7 @@ export const QuestionCreator = ({ onQuestionChange }) => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen min-w-screen bg-gray-50">
-      {console.log(questions)}
-      <div className="flex flex-col justify-center items-center w-[80%] bg-gray-100 rounded-2xl p-8 border border-gray-200 overflow-y-auto padding-top-10 padding-bottom-10">
+      <div className="flex flex-col justify-center items-center w-[80%] bg-white rounded-2xl p-8 shadow-md border border-gray-200 overflow-y-auto padding-top-10 padding-bottom-10">
         {!questions ||
           (questions && questions.length < 1 && (
             <h1 className="flex justify-center items-center text-gray-400 !text-base">
@@ -168,7 +167,6 @@ export const QuestionCreator = ({ onQuestionChange }) => {
           </Button>
         </div>
       </div>
-    </div>
   );
 };
 
