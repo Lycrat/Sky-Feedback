@@ -7,24 +7,26 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
+import { useParams } from "react-router";
 
 // const apiUrl = import.meta.env.VITE_API_URL;
 
-export const ViewData = ({ id, userId }) => {
-  const [data, setData] = useState([
-    { question: "how are you?", answer: "fine mate and you" },
-  ]);
+export const ViewData = () => {
+  const [questions, setQuestions] = useState([]);
+  const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userList, setUserList] = useState(null);
   const [selectedUser, setSelectedUser] = useState("None");
+
+  const { formId } = useParams();
 
   useEffect(() => {
     const handleFetchAllUsers = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/api/user/`);
         if (response.status == 200) {
-          console.log("successful");
-          console.log(response);
+          // console.log("successful");
+          // console.log(response);
           const data = response.data;
           setUserList(data);
           const firstUser = data[0].name;
@@ -40,14 +42,34 @@ export const ViewData = ({ id, userId }) => {
   }, []);
 
   useEffect(() => {
+    const handleFetchFormQuestions = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/questionnaire/${formId}/question`
+        );
+        if (response.status === 200) {
+          setQuestions(response.data);
+          // console.log("Successful");
+        } else {
+          console.error("Request was unsuccessful");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    handleFetchFormQuestions();
+  }, [formId]);
+
+  useEffect(() => {
     const handleFetchUserData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/${id}/${userId}/`
+          `http://localhost:5000/api/questionnaire${formId}/question/id/feedback`
         );
         if (response.status === 200) {
-          setData(response.data);
-          console.log("Successful");
+          setAnswers(response.data);
+          // console.log("Successful");
         } else {
           console.error("Request was unsuccessful");
         }
@@ -59,7 +81,7 @@ export const ViewData = ({ id, userId }) => {
     };
 
     handleFetchUserData();
-  }, [id]);
+  }, [selectedUser]);
 
   const handleUserSelection = (e) => {
     setSelectedUser(e);
@@ -73,7 +95,7 @@ export const ViewData = ({ id, userId }) => {
     );
   }
 
-  if (!data) {
+  if (!questions) {
     return (
       <div className="flex flex-col items-center justify-center -mt-40 w-full h-full gap-2 bg-gray-100">
         <h6 className="text-gray-900">No data found.</h6>
@@ -83,8 +105,10 @@ export const ViewData = ({ id, userId }) => {
 
   return (
     <div className="flex flex-col h-full bg-gray-100 px-20 pt-20">
+      {/* {console.log("useparams", formId)} */}
+      {console.log("data", questions)}
       <div className="flex flex-row justify-between items-center text-gray-900">
-        <h2 className="text-2xl">{data?.title ? data.title : "Form Title"}</h2>
+        {/* <h2 className="text-2xl">{data?.title ? data.title : "Form Title"}</h2> */}
         <FormControl
           size="large"
           variant="outlined"
@@ -114,7 +138,7 @@ export const ViewData = ({ id, userId }) => {
         </FormControl>
       </div>
       <div className="flex mt-10 w-full h-screen text-gray-900">
-        {data &&
+        {/* {data &&
           data.map((d, index) => {
             return (
               <div key={index}>
@@ -124,7 +148,7 @@ export const ViewData = ({ id, userId }) => {
                 <h3 className="text-gray-500 font-light text-xl">{d.answer}</h3>
               </div>
             );
-          })}
+          })} */}
       </div>
     </div>
   );
