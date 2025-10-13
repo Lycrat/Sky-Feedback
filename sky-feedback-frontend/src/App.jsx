@@ -1,8 +1,7 @@
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { Layout } from "./components";
-import { UserQuestionaire } from "./pages";
-import QuestionCreator from "./components/QuestionCreator";
+import { UserQuestionaire, AddEditWrapper } from "./pages";
 import HomeDashboard from "./pages/HomeDashboard";
 
 import ViewData from "./pages/ViewData";
@@ -15,8 +14,9 @@ function App() {
             <Route index element={<HomeDashboard />} />
             <Route path="/questionnaire/:id" element={<UserQuestionaire />} />
             <Route path="/view-data/:formId" element={<ViewData />} />
+            <Route path="/create-form" element={<AddEditWrapper />}/>
+            <Route path="/edit/:id" element={<AddEditWrapper mode="edit" />}/>
           </Route>
-          <Route path="question-creator" element={<QuestionCreator />} />
         </Routes>
       </BrowserRouter>
     </>

@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { TextField, Button, MenuItem, IconButton, Radio } from "@mui/material";
 import { Delete, Add } from "@mui/icons-material";
 
-export const QuestionCreator = ({ onQuestionChange }) => {
+export const QuestionCreator = ({ onQuestionChange, initialQuestions }) => {
   const [questions, setQuestions] = useState([
-    { id: Date.now(), text: "", type: "textarea", options: [] },
+    { id: Date.now(), question: "", type: "text", options: [] },
   ]);
 
   useEffect(() => {
@@ -16,7 +16,7 @@ export const QuestionCreator = ({ onQuestionChange }) => {
   const addQuestion = () => {
     setQuestions((prev) => [
       ...prev,
-      { id: Date.now(), text: "", type: "textarea", options: [] },
+      { id: Date.now(), question: "", type: "text", options: [] },
     ]);
   };
 
@@ -71,9 +71,7 @@ export const QuestionCreator = ({ onQuestionChange }) => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen min-w-screen bg-gray-50">
-      {console.log(questions)}
-      <div className="flex flex-col justify-center items-center w-[80%] bg-gray-100 rounded-2xl p-8 border border-gray-200 overflow-y-auto padding-top-10 padding-bottom-10">
+      <div className="flex flex-col justify-center items-center w-[80%] bg-white rounded-2xl p-8 shadow-md border border-gray-200 overflow-y-auto padding-top-10 padding-bottom-10">
         {!questions ||
           (questions && questions.length < 1 && (
             <h1 className="flex justify-center items-center text-gray-400 !text-base">
@@ -88,9 +86,9 @@ export const QuestionCreator = ({ onQuestionChange }) => {
                 label={`Question ${index + 1}`}
                 variant="outlined"
                 fullWidth
-                value={question.text}
+                value={question.question}
                 onChange={(e) =>
-                  updateQuestion(question.id, "text", e.target.value)
+                  updateQuestion(question.id, "question", e.target.value)
                 }
               />
 
@@ -103,7 +101,7 @@ export const QuestionCreator = ({ onQuestionChange }) => {
                 }
                 className="w-full md:w-48"
               >
-                <MenuItem value="textarea">Paragraph</MenuItem>
+                <MenuItem value="text">Paragraph</MenuItem>
                 <MenuItem value="multiple">Multiple Choice</MenuItem>
               </TextField>
 
@@ -168,7 +166,6 @@ export const QuestionCreator = ({ onQuestionChange }) => {
           </Button>
         </div>
       </div>
-    </div>
   );
 };
 
