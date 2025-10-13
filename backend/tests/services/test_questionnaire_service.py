@@ -24,26 +24,21 @@ class TestQuestionnaireService(unittest.TestCase):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]['title'], 'Survey A')
 
-
-
+    @patch('backend.services.questionnaire_service.get_questions')
     @patch('backend.services.questionnaire_service.DataAccess')
-    def test_get_questionnaire(self, mock_data_access):
+    def test_get_questionnaire(self, mock_data_access, mock_get_questions):
         mock_instance = mock_data_access.return_value
         mock_instance.query.return_value = [
             {'id': 1, 'title': 'Survey A', 'created_at': '2025-10-01'}
         ]
 
-        mock_instance.callproc.return_value = [{"created_at": '2025-10-01',
+        mock_get_questions.return_value = [{
                 "id": 1,
-                "qn.id": 1,
-                "question": "How are you?",
-                "questionnaire_id": 1,
-                "title": "Survey A"}]
+                "question": "How are you?"}]
 
 
         result = get_questionnaire(1)
 
-        mock_instance.callproc.assert_called_once_with("GETQuestionnaire", (1,))
         self.assertEqual(result['questionnaire'][0]['title'], 'Survey A')
         self.assertEqual(result['questions'][0]['question'], 'How are you?')
 
@@ -59,7 +54,7 @@ class TestQuestionnaireService(unittest.TestCase):
 
         data = {
             'title': 'Survey A',
-            'questions_list': ["Q1", "Q2"]
+            'questions_list': [{"question":"Q1"}, {"question":"Q2"}]
         }
 
         result = create_questionnaire(data)
@@ -77,28 +72,28 @@ class TestQuestionnaireService(unittest.TestCase):
         mock_instance.execute.assert_called_once_with("DELETE FROM Questionnaire WHERE id = %s;", 1)
         self.assertTrue(result)
 
+    @patch('backend.services.questionnaire_service.get_questions')
+    @patch('backend.services.questionnaire_service.add_question')
     @patch('backend.services.questionnaire_service.update_question')
     @patch('backend.services.questionnaire_service.get_questionnaire')
     @patch('backend.services.questionnaire_service.DataAccess')
-    def test_update_questionnaire(self, mock_data_access, mock_get_questionnaire, mock_update_question):
+    def test_update_questionnaire(self, mock_data_access, mock_get_questionnaire, mock_update_question, mock_get_questions, mock_add_question):
         mock_instance = mock_data_access.return_value
         mock_instance.execute.return_value = 1
+        mock_get_questions.return_value = [{'id': 1, 'question': 'Q1','questionnaire_id': 1},
+                                          {'id': 2, 'question': 'Q2', 'questionnaire_id': 1}]
         mock_get_questionnaire.return_value = {'questionnaire': [{'id': 1, 'title': 'Updated Survey', "created_at": '2025-10-01'}],
-                                               'questions': [{"created_at": '2025-10-01',
-                                                              "id": 2,
-                                                              "qn.id": 1,
-                                                              "question": "Updated Q1",
-                                                              "questionnaire_id": 1,
-                                                              "title": "Updated Survey"}]}
+                                               'questions': [{'id': 1, 'question': 'Updated Q1','questionnaire_id': 1},
+                                                             {'id': 2, 'question': 'Updated Q2', 'questionnaire_id': 1}]}
 
-        mock_update_question.return_value = {'id': 2, "questionnaire_id": 1, 'question': 'Updated Q1'}
-
+        mock_update_question.return_value = {'id': 2, "questionnaire_id": 1, 'question': 'Updated Q2'}
+        mock_add_question.return_value = [{'id': 3, 'question': 'Q3', 'questionnaire_id': 1}]
         data = {
             'title': 'Updated Survey',
-            'to_update_questions': [{'id': 2, 'question': 'Updated Q1', "questionnaire_id": 1}]
+            'questions_list': [{'id': 1, 'question': 'Updated Q1'}, {'id': 2, 'question': 'Updated Q2'}, {'question': 'Updated Q3'}]
         }
 
         result = update_questionnaire(1,data)
         mock_instance.callproc.assert_called_once_with("UpdateQuestionnaire", (1, 'Updated Survey'))
-        mock_update_question.assert_called_once_with(2, {'id': 2, 'question': 'Updated Q1', "questionnaire_id": 1})
+
         self.assertEqual(result['questionnaire'][0]['title'], 'Updated Survey')

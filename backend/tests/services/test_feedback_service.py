@@ -45,7 +45,7 @@ class TestFeedbackService(unittest.TestCase):
             'id':3, 'question_id':1, 'user_id':3, 'feedback':"The app looks great"
         }
 
-        result = add_feedback(3,1,"The app looks great")
+        result = add_feedback(1,3,"The app looks great")
         assert result == {
             'id':3, 'question_id':1, 'user_id':3, 'feedback':"The app looks great"
         }
