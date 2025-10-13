@@ -6,7 +6,7 @@ from backend.database.data_access import DataAccess
 def get_users():
     data_access = DataAccess()
     try:
-        users = data_access.query("SELECT id, username, name FROM User")
+        users = data_access.query("SELECT id, username, name FROM Users")
     except pymysql.MySQLError as e:
         raise RuntimeError(f'Database query error: {e}')
 
@@ -18,7 +18,7 @@ def get_users():
 def get_user(user_id):
     data_access = DataAccess()
     try:
-        user = data_access.query("SELECT id, username, name FROM User WHERE id = %s", user_id)
+        user = data_access.query("SELECT id, username, name FROM Users WHERE id = %s", user_id)
     except pymysql.MySQLError as e:
         raise RuntimeError(f'Database query error: {e}')
 

@@ -1,9 +1,10 @@
+DROP database skyfeedbackdb;
 CREATE database skyfeedbackdb;
 
 use skyfeedbackdb;
 
 DROP TABLE Feedback;
-DROP TABLE User;
+DROP TABLE Users;
 DROP TABLE Question;
 DROP TABLE Questionnaire;
 
@@ -22,7 +23,7 @@ CREATE TABLE Question (
   FOREIGN KEY (questionnaire_id) REFERENCES Questionnaire (id) ON DELETE CASCADE
 );
 
-CREATE TABLE User (
+CREATE TABLE Users (
   id INT AUTO_INCREMENT,
   username VARCHAR(100) NOT NULL,
   name VARCHAR(100) NOT NULL,

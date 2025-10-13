@@ -2,13 +2,13 @@
 use skyfeedbackdb;
 
 
-DROP PROCEDURE AddQuestion;
-DROP PROCEDURE AddQuestionnaire;
-DROP PROCEDURE AddFeedback;
-DROP PROCEDURE AddUser;
-DROP PROCEDURE UpdateQuestion;
-DROP PROCEDURE UpdateQuestionnaire;
-DROP PROCEDURE GETQuestionnaire;
+-- DROP PROCEDURE AddQuestion;
+-- DROP PROCEDURE AddQuestionnaire;
+-- DROP PROCEDURE AddFeedback;
+-- DROP PROCEDURE AddUser;
+-- DROP PROCEDURE UpdateQuestion;
+-- DROP PROCEDURE UpdateQuestionnaire;
+-- DROP PROCEDURE GETQuestionnaire;
 
 
 -- ADD and UPDATE Questionnaire 
@@ -66,7 +66,7 @@ delimiter //
 
 CREATE PROCEDURE AddUser(IN username VARCHAR(100), IN name VARCHAR(100))
 BEGIN
-	INSERT INTO User(username, name) values (username, name);
+	INSERT INTO Users(username, name) values (username, name);
 END //
      
 
