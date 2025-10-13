@@ -1,7 +1,7 @@
 import pymysql
 
-from backend.database.data_access import DataAccess
-from backend.services.question_service import add_question, update_question
+from database.data_access import DataAccess
+from services.question_service import add_question, update_question
 
 #  GET ALL questionnaires
 def get_questionnaires():
