@@ -47,9 +47,6 @@ def get_questionnaire(questionnaire_id):
 @questionnaire_bp.route('/<int:questionnaire_id>', methods=['PUT'])
 def update_questionnaire(questionnaire_id):
     data = request.get_json()
-    title = data.get('title')
-    if not title:
-        return jsonify({"error": "Title is required"}), 400
 
     try:
         updated_questionnaire = questionnaire_service.update_questionnaire(questionnaire_id, data)
