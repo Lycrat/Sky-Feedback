@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from backend.services.question_service import (get_questions,
+from services.question_service import (get_questions,
                                                get_question,
                                                add_question,
                                                delete_question,
@@ -12,7 +12,7 @@ from backend.services.question_service import (get_questions,
 
 class TestQuestionService(unittest.TestCase):
     # Mock DataAccess path
-    DATA_ACCESS_PATH = 'backend.services.question_service.DataAccess'
+    DATA_ACCESS_PATH = 'services.question_service.DataAccess'
 
     # Test get_questions
     @patch(DATA_ACCESS_PATH)
@@ -58,8 +58,8 @@ class TestQuestionService(unittest.TestCase):
         mock_instance.execute.assert_called_once_with("DELETE FROM Question WHERE id = (%s);", 1)
 
     # Test update_question
-    @patch("backend.services.question_service.replace_options")
-    @patch('backend.services.question_service.get_question')
+    @patch("services.question_service.replace_options")
+    @patch('services.question_service.get_question')
     @patch(DATA_ACCESS_PATH)
     def test_update_question_success(self, mock_data_access, mock_get_question, mock_replace_options):
 
@@ -92,7 +92,7 @@ class TestQuestionService(unittest.TestCase):
         get_options_by_question_id(1)
         mock_instance.query.assert_called_once_with("SELECT id, option_text FROM Options WHERE question_id = %s ORDER BY id ASC", 1)
 
-    @patch('backend.services.question_service.add_option')
+    @patch('services.question_service.add_option')
     @patch(DATA_ACCESS_PATH)
     def test_replace_options_success(self, mock_data_access, mock_add_option):
         mock_instance = mock_data_access.return_value

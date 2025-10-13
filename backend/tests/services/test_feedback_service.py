@@ -1,12 +1,12 @@
 import unittest
 from unittest.mock import patch
 
-from backend.services.feedback_service import (get_feedbacks, get_feedbacks_by_user_id, add_feedback)
+from services.feedback_service import (get_feedbacks, get_feedbacks_by_user_id, add_feedback)
 
 
 class TestFeedbackService(unittest.TestCase):
 
-    DATA_ACCESS_PATH = "backend.services.feedback_service.DataAccess"
+    DATA_ACCESS_PATH = "services.feedback_service.DataAccess"
 
     # Test get_feedbacks
     @patch(DATA_ACCESS_PATH)
@@ -37,7 +37,7 @@ class TestFeedbackService(unittest.TestCase):
         mock_instance.query.assert_called_with("SELECT id, question_id, feedback FROM Feedback WHERE user_id=%s", 1)
 
     # Test get_add_feedback
-    @patch('backend.services.feedback_service.get_feedback')
+    @patch('services.feedback_service.get_feedback')
     @patch(DATA_ACCESS_PATH)
     def test_add_feedback(self, data_access_mock, mock_get_feedback):
         mock_instance = data_access_mock.return_value

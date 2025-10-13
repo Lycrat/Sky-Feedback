@@ -1,11 +1,10 @@
 import unittest
 from unittest.mock import patch
-from backend.services.user_service import (get_users, get_user, add_user)
-
+from services.user_service import (get_users, get_user, add_user)
 
 class TestUserService(unittest.TestCase):
 
-    DATA_ACCESS_PATH = 'backend.services.user_service.DataAccess'
+    DATA_ACCESS_PATH = 'services.user_service.DataAccess'
 
     @patch(DATA_ACCESS_PATH)
     def test_get_users(self, data_access_mock):
@@ -29,7 +28,7 @@ class TestUserService(unittest.TestCase):
         mock_data_access_instance.query.assert_called_once()
         assert users == {'id': 1, 'username': 'user1', 'name': 'User One'}
 
-    @patch("backend.services.user_service.get_user")
+    @patch("services.user_service.get_user")
     @patch(DATA_ACCESS_PATH)
     def test_get_users_success(self, mock_data_access, mock_get_user):
         mock_data_access_instance = mock_data_access.return_value
