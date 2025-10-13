@@ -13,6 +13,7 @@ CREATE TABLE Question (
   id INT AUTO_INCREMENT,
   questionnaire_id INT NOT NULL,
   question VARCHAR(200) NOT NULL,
+  type VARCHAR(50) NOT NULL DEFAULT 'text',
   PRIMARY KEY (id),
   FOREIGN KEY (questionnaire_id) REFERENCES Questionnaire (id) ON DELETE CASCADE
 );
