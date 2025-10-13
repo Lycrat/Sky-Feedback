@@ -177,4 +177,14 @@ def get_feedback(questionnaire_id, question_id):
         return jsonify(feedback), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@questionnaire_bp.route(
+    '/<int:questionnaire_id>/<int:user_id>/feedback', methods=['GET'])
+def get_user_feedbacks(questionnaire_id, user_id):
+    try:
+        feedback = feedback_service.get_feedbacks_by_user_id_questionnaire_id(questionnaire_id,user_id)
+        return jsonify(feedback), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     

@@ -24,6 +24,29 @@ def get_feedbacks_by_user_id(user_id):
     # Convert to a dictionary for easier consumption
     return user_feedbacks
 
+def get_feedbacks_by_user_id_questionnaire_id(questionnaire_id, user_id):
+    data_access = DataAccess()
+    try:
+        user_feedbacks = data_access.query("""
+            SELECT     
+                fba.user_id,     
+                q.questionnaire_id,     
+                q.id AS question_id,     
+                fba.id AS feedback_id,     
+                q.question,     
+                fba.feedback
+            FROM Feedback AS fba
+            INNER JOIN Question AS q ON fba.question_id = q.id
+            WHERE fba.user_id = %s AND q.questionnaire_id = %s;
+        """, (user_id, questionnaire_id))
+
+    except pymysql.MySQLError as e:
+        raise RuntimeError(f'Database query error: {e}')
+
+    # Convert to a dictionary for easier consumption
+    return user_feedbacks
+
+
 def get_feedback_by_question_id(question_id):
     data_access = DataAccess()
     try:
