@@ -1,7 +1,8 @@
 import pymysql
 
 from database.data_access import DataAccess
-from services.question_service import add_question, update_question, get_questions, delete_question
+from services.question_service import add_question, update_question
+
 #  GET ALL questionnaires
 def get_questionnaires():
     try:
@@ -16,18 +17,34 @@ def get_questionnaire (questionnaire_id):
     data_access = DataAccess()
     try:
         questionnaire = data_access.query("SELECT id, title, created_at FROM Questionnaire WHERE id = %s", questionnaire_id)
-        # To add a stored procedure to return all the questions of the questionnaire as well
-        # details = data_access.query("CALL GETQuestionnaire(%s);", questionnaire_id)
-        details = get_questions(questionnaire_id)
+        details = data_access.callproc("GETQuestionnaire", (questionnaire_id,))
     except pymysql.MySQLError as e:
         raise RuntimeError(f'Database query error: {e}')
 
-    return {"questionnaire": questionnaire, "questions": details}
+    # Group rows to consolidate options under each question
+    questions_map = {}
+    for row in details or []:
+        qid = row.get('question_id') or row.get('id')
+        if not qid:
+            continue
+        if qid not in questions_map:
+            questions_map[qid] = {
+                'id': qid,
+                'questionnaire_id': questionnaire_id,
+                'question': row.get('question'),
+                'type': row.get('type', 'text'),
+                'options': []
+            }
+        if row.get('option_text') is not None:
+            questions_map[qid]['options'].append(row['option_text'])
+
+    questions_list = list(questions_map.values())
+    return {"questionnaire": questionnaire, "questions": questions_list}
 
 #  CREATE questionnaire
 def create_questionnaire(data):
     questionnaire_title = data.get('title')
-    questions_list = data.get('questions_list', [])
+    questions_list = data.get('questions_list') or []
 
     try:
         data_access = DataAccess()
@@ -42,9 +59,15 @@ def create_questionnaire(data):
 
         # Add the questions to the question table
         for item in questions_list:
-            question_text = item.get('question')
-
-            add_question(last_row_id, question_text)
+            if isinstance(item, dict):
+                q_text = item.get('question') or item.get('text') or item.get('title')
+                q_type = item.get('type')
+                options = item.get('options')
+            else:
+                q_text = str(item)
+                q_type = 'text'
+                options = None
+            add_question(last_row_id, q_text, q_type or ('multiple' if options else 'text'), options)
 
         questionnaire = get_questionnaire(last_row_id)
 
@@ -64,41 +87,74 @@ def delete_questionnaire(questionnaire_id):
 
 # UPDATE questionnaire
 def update_questionnaire(questionnaire_id, data):
-    title = data['title']
-    # get new questions list (with new, updated and deleted questions)
-    new_ques_list = data.get('questions_list', [])
-    # get current questions list from db
-    current_ques_list = get_questions(questionnaire_id)
+    # Title can be optional when only questions are being modified
+    title = data.get('title')
 
-    # Determine which questions to add, update, or delete
-    current_ques_dict = {q['id']: q for q in current_ques_list}
-    print("Current Questions Dict:", current_ques_dict)
+    # Preferred new contract: provide a full list of questions to sync
+    questions_list = data.get('questions_list')
+    # Backward compatibility: allow explicit update list
+    to_update_ques_list = data.get('to_update_questions')
 
-    existing_updated_ques_dict = {q.get('id'): q for q in new_ques_list if q.get('id') is not None}
-    print("Existing/Updated Questions Dict:", existing_updated_ques_dict)
-
-    # Questions to delete (present in current but not in new)
-    to_delete = [q_id for q_id in current_ques_dict if q_id not in existing_updated_ques_dict]
-    # Questions to add (present in new but not in current)
-    to_add = [q for q in new_ques_list if q.get('id') is None]
-    # Questions to update (present in both)
-    to_update = [existing_updated_ques_dict[q_id] for q_id in existing_updated_ques_dict if q_id in current_ques_dict]
-
-    print("To Delete:", to_delete)
-    print("To Add:", to_add)
-    print("To Update:", to_update)
-    
-    # Perform the updates, additions, and deletions
     data_access = DataAccess()
-    data_access.callproc("UpdateQuestionnaire", (questionnaire_id, title))
-    for q in to_update:
-        update_question(questionnaire_id, q['id'], q)
-    for q in to_add:
-        add_question(questionnaire_id, q['question'])
-    for q_id in to_delete:
-        delete_question(q_id)
+    if title is not None:
+        data_access.callproc('UpdateQuestionnaire', (questionnaire_id, title,))
 
-    # Return the updated questionnaire with its questions
+    # If a full list is provided, sync (add/update/delete) and handle options
+    if isinstance(questions_list, list):
+        # Fetch current questions
+        try:
+            from services.question_service import get_questions, delete_question
+        except Exception:
+            # Local import fallback already available at top for add/update
+            from services import question_service as _qs
+            get_questions = _qs.get_questions
+            delete_question = _qs.delete_question
+
+        current = get_questions(questionnaire_id) or []
+        current_ids = {q.get('id') for q in current if q.get('id') is not None}
+
+        provided_ids = set()
+        for item in questions_list:
+            if isinstance(item, dict):
+                qid = item.get('id')
+                q_text = item.get('question') or item.get('text') or item.get('title')
+                q_type = item.get('type')
+                options = item.get('options')
+            else:
+                qid = None
+                q_text = str(item)
+                q_type = 'text'
+                options = None
+
+            if qid and qid in current_ids:
+                provided_ids.add(qid)
+                update_question(questionnaire_id, qid, {
+                    'question': q_text,
+                    'type': q_type,
+                    'options': options
+                })
+            else:
+                created = add_question(
+                    questionnaire_id,
+                    q_text,
+                    q_type or ('multiple' if options else 'text'),
+                    options
+                )
+                # Track created id to avoid accidental deletion in subsequent cleanup
+                if created and isinstance(created, dict) and created.get('id'):
+                    provided_ids.add(created['id'])
+
+        # Delete questions that were removed from the list
+        to_delete = current_ids - provided_ids
+        for qid in to_delete:
+            delete_question(qid)
+
+    # Legacy partial update: only update provided items
+    elif to_update_ques_list:
+        for item in to_update_ques_list:
+            qid = item['id']
+            update_question(questionnaire_id, qid, item)
+
     updated_questionnaire = get_questionnaire(questionnaire_id)
 
     return updated_questionnaire
