@@ -1,4 +1,4 @@
 import UserQuestionaire from "./UserQuestionaire";
-import AddEditPage from "./AddEditPage";
+import AddEditWrapper from "./AddEditPage"
 
-export { UserQuestionaire, AddEditPage};
+export { UserQuestionaire, AddEditWrapper};

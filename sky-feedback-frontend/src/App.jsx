@@ -1,7 +1,7 @@
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { Layout } from "./components";
-import { UserQuestionaire, AddEditPage } from "./pages";
+import { UserQuestionaire, AddEditWrapper } from "./pages";
 import HomeDashboard from "./pages/HomeDashboard";
 
 import ViewData from "./pages/ViewData";
@@ -13,9 +13,9 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<HomeDashboard />} />
             <Route path="/questionnaire/:id" element={<UserQuestionaire />} />
-            <Route path="/create-form" element={<AddEditPage />}/>
-            <Route path="/edit/:id" element={<AddEditPage mode="edit" />}/>
             <Route path="/view-data/:formId" element={<ViewData />} />
+            <Route path="/create-form" element={<AddEditWrapper />}/>
+            <Route path="/edit/:id" element={<AddEditWrapper mode="edit" />}/>
           </Route>
         </Routes>
       </BrowserRouter>

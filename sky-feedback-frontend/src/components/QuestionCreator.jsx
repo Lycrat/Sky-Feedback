@@ -1,12 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { TextField, Button, MenuItem, IconButton, Radio } from "@mui/material";
 import { Delete, Add } from "@mui/icons-material";
 
 export const QuestionCreator = ({ onQuestionChange, initialQuestions }) => {
-  const [questions, setQuestions] = useState(
-    initialQuestions && initialQuestions.length > 0 ? initialQuestions : [
-    { id: Date.now(), text: "", type: "textarea", options: [] },
+  const [questions, setQuestions] = useState([
+    { id: Date.now(), question: "", type: "textarea", options: [] },
   ]);
+  const hasLoadedInitialData = useRef(false);
+
+  useEffect(() => {
+    // Only load initial data once, when it first arrives
+    if (initialQuestions && initialQuestions.length > 0 && !hasLoadedInitialData.current) {
+      console.log(initialQuestions)
+      let formattedQuestions = initialQuestions.map(obj => {
+        if (Array.isArray(obj.options) && obj.options.length === 0) {
+          return { ...obj, type: "textarea" };
+        } else {
+          return { ...obj, type: "multiple" };
+        }
+      });
+      setQuestions(formattedQuestions);
+      hasLoadedInitialData.current = true;
+    }
+  }, [initialQuestions]);
 
   useEffect(() => {
     if (onQuestionChange) {
@@ -17,7 +33,7 @@ export const QuestionCreator = ({ onQuestionChange, initialQuestions }) => {
   const addQuestion = () => {
     setQuestions((prev) => [
       ...prev,
-      { id: Date.now(), text: "", type: "textarea", options: [] },
+      { id: Date.now(), question: "", type: "textarea", options: [] },
     ]);
   };
 
@@ -87,9 +103,9 @@ export const QuestionCreator = ({ onQuestionChange, initialQuestions }) => {
                 label={`Question ${index + 1}`}
                 variant="outlined"
                 fullWidth
-                value={question.text}
+                value={question.question}
                 onChange={(e) =>
-                  updateQuestion(question.id, "text", e.target.value)
+                  updateQuestion(question.id, "question", e.target.value)
                 }
               />
 
