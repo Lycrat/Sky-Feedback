@@ -10,6 +10,8 @@ import {
 import { useParams } from "react-router";
 import DataRow from "../components/DataRow";
 
+const apiURL = import.meta.env.VITE_API_URL;
+
 export const ViewData = () => {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
@@ -23,9 +25,7 @@ export const ViewData = () => {
   useEffect(() => {
     const handleFetchTitle = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:5000/api/questionnaire/${formId}`
-        );
+        const res = await axios.get(`${apiURL}/api/questionnaire/${formId}`);
         if (res.status == 200) {
           console.log("res", res);
           setFormTitle(res.data.questionnaire[0].title);
@@ -41,7 +41,7 @@ export const ViewData = () => {
 
     const handleFetchAllUsers = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/user/`);
+        const response = await axios.get(`${apiURL}/api/user/`);
         if (response.status === 200) {
           const data = response.data;
           setUserList(data);
@@ -61,7 +61,7 @@ export const ViewData = () => {
     const handleFetchFormQuestions = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/questionnaire/${formId}/question`
+          `${apiURL}/api/questionnaire/${formId}/question`
         );
         if (response.status === 200) {
           setQuestions(response.data);
@@ -84,7 +84,7 @@ export const ViewData = () => {
         const results = await Promise.all(
           questions.map(async (q) => {
             const res = await axios.get(
-              `http://localhost:5000/api/questionnaire/${formId}/question/${q.id}/feedback`
+              `${apiURL}/api/questionnaire/${formId}/question/${q.id}/feedback`
             );
             if (res.status === 200) {
               console.log(res.data);
