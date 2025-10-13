@@ -1,18 +1,27 @@
 import React, { useEffect, useState, Fragment } from "react";
 import { useParams } from "react-router";
 import axios from "axios";
+
+const TextInput = ({ label, placeholder = "e.g. mrRobot", name, value }) => {
+  return (
+    <>
+      <label className="font-bold text-gray-500 text-2xl" for="username">
+        {label}
+      </label>
+      <input
+        className="border border-gray-300 rounded-sm h-10 pl-5"
+        type="text"
+        placeholder={placeholder}
+        name={name}
+        value={value}
+      />
+    </>
+  );
+};
 const UserQuestionaire = () => {
-  const [answers, setAnswers] = useState({});
+  const [answers, setAnswers] = useState([]);
   const { id } = useParams();
   const [questions, setQuestions] = useState();
-  const dummyData = {
-    title: "Bamjam",
-    questions: [
-      {
-        title: "How was your overall experience",
-      },
-    ],
-  };
 
   useEffect(() => {
     axios
@@ -25,39 +34,75 @@ const UserQuestionaire = () => {
       });
   }, [answers]);
 
-  useEffect(() => {
-    console.log(questions);
-  }, [questions]);
+  useEffect(() => {}, [questions]);
 
-  const handleChange = (id, value) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
+  const handleChange = (value, dataId) => {
+    setAnswers((prev) => {
+      const exists = prev.some((ans) => (ans ? ans.id === dataId : false));
+      if (exists) {
+        return prev.map((ans) =>
+          ans.id === dataId ? { ...ans, feedback: value } : ans
+        );
+      } else {
+        return [...prev, { id: dataId, feedback: value }];
+      }
+    });
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
+    const username = e.target.username.value;
+    const name = e.target.name.value;
+
+    let user_id = null;
+    // find user id
+    console.log(username, name);
+    try {
+      const res = await axios.get(
+        "http://localhost:5000/api/user/",
+        {
+          params: {
+            username: "Mr Robot",
+            name: "Panya",
+          },
+        },
+        {}
+      );
+      if (res.data) {
+        user_id = res.data[0].id;
+      }
+    } catch (err) {
+      console.log(err);
+    }
+
+    // Send feedbacks
+    answers.map(async (answer, index) => {
+      try {
+        const res = await axios.post(
+          `http://localhost:5000/api/questionnaire/${id}/question/${answer.id}/feedback`,
+          {
+            user_id: user_id,
+            feedback: answer.feedback,
+          }
+        );
+        console.log(res.data);
+      } catch (err) {
+        console.log(err);
+      }
+    });
   };
 
-  const TextInput = ({ label, placeholder = "e.g. mrRobot", name }) => {
-    return (
-      <>
-        <label className="font-bold text-gray-500 text-2xl" for="username">
-          {label}
-        </label>
-        <input
-          className="border border-gray-300 rounded-sm h-10 pl-5"
-          type="text"
-          placeholder={placeholder}
-          name={name}
-        />
-      </>
-    );
+  const getStoredAnswer = (id) => {
+    const answer = answers.find((answer) => answer.id === id);
+    return answer ? answer.feedback : "";
   };
+
   return (
     <div className="flex w-full h-full flex-col bg-white text-black justify-center items-center md:justify-start md:items-start">
-      <form className="w-full h-full flex flex-col gap-10 lg:w-1/2 p-5">
+      <form
+        className="w-full h-full flex flex-col gap-10 lg:w-1/2 p-5"
+        onSubmit={onSubmit}
+      >
         <p className="text-4xl font-light">
           {" "}
           {questions?.questionnaire[0].title}{" "}
@@ -69,16 +114,27 @@ const UserQuestionaire = () => {
         {questions?.questions.map((item, index) => {
           return (
             <Fragment key={index}>
-              <p className="font-bold text-gray-500 text-2xl">{item.title}</p>
+              <p className="font-bold text-gray-500 text-2xl">
+                {item.question}
+              </p>
               <textarea
                 type="text"
                 name="answer"
                 className="h-40 md:h-20 lg:h-60 border border-gray-300 rounded-sm p-5 "
-                onChange={(e) => handleChange(index, e.target.value)}
+                value={getStoredAnswer(item.id)}
+                onChange={(e) => handleChange(e.target.value, item.id)}
               />
             </Fragment>
           );
         })}
+        <div className="flex flex-row justify-center items-center md:justify-start md:items-start">
+          <button
+            type="submit"
+            className="rounded-lg bg-orange-500 w-50 text-white h-10"
+          >
+            Submit
+          </button>
+        </div>
       </form>
     </div>
   );
