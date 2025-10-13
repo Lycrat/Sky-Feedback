@@ -14,11 +14,30 @@ export const ViewData = () => {
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [userList, setUserList] = useState([]);
+  const [formTitle, setFormTitle] = useState("");
   const [selectedUser, setSelectedUser] = useState({ id: "", name: "" });
 
   const { formId } = useParams();
 
   useEffect(() => {
+    const handleFetchTitle = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/questionnaire/${formId}`
+        );
+        if (res.status == 200) {
+          console.log("res", res);
+          setFormTitle(res.data.questionnaire[0].title);
+        } else {
+          console.error("Unable to fetch form title");
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    handleFetchTitle();
+
     const handleFetchAllUsers = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/api/user/`);
@@ -37,9 +56,7 @@ export const ViewData = () => {
       }
     };
     handleFetchAllUsers();
-  }, []);
 
-  useEffect(() => {
     const handleFetchFormQuestions = async () => {
       try {
         const response = await axios.get(
@@ -66,11 +83,12 @@ export const ViewData = () => {
         const results = await Promise.all(
           questions.map(async (q) => {
             const res = await axios.get(
-              `http://localhost:5000/api/questionnaire/${formId}/question/${q.questionnaire_id}/feedback`
+              `http://localhost:5000/api/questionnaire/${formId}/question/${q.id}/feedback`
             );
             if (res.status === 200) {
+              console.log(res.data);
               const filtered = res.data.filter(
-                (f) => f.userId === selectedUser.id
+                (f) => f.user_id === selectedUser.id
               );
               return { questionId: q.id, feedback: filtered };
             }
@@ -104,20 +122,13 @@ export const ViewData = () => {
     );
   }
 
-  if (!questions || questions.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center -mt-40 w-full h-full gap-2 bg-gray-100">
-        <h6 className="text-gray-900">No data found.</h6>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col h-full bg-gray-100 px-20 pt-20">
-      {console.log("questions", questions)}
-      {console.log("answers", answers)}
+      {/* {console.log("questions", questions)}
+      {console.log("answers", answers)} */}
+      {console.log(userList)}
       <div className="flex flex-row justify-between items-center text-gray-900">
-        <h2 className="text-2xl">Form Title</h2>
+        <h2 className="text-2xl">{formTitle ? formTitle : "Form Title"}</h2>
         <FormControl
           size="large"
           variant="outlined"
@@ -146,23 +157,30 @@ export const ViewData = () => {
         </FormControl>
       </div>
 
-      <div className="flex mt-10 w-full h-screen text-gray-900">
+      <div className="flex flex-col gap-14 mt-10 w-full h-screen text-gray-900">
         {questions &&
           questions.map((d, index) => {
+            console.log("answers", answers);
             const answerObj = answers.find((a) => a.questionId === d.id);
-            const userFeedback =
-              answerObj && answerObj.feedback.length > 0
-                ? answerObj.feedback[0].feedback
-                : "No feedback yet";
+            // console.log(answerObj);
 
             return (
               <div key={index}>
                 <h2 className="text-gray-500 font-bold text-2xl">
                   {d.question}
                 </h2>
-                <h3 className="text-gray-500 font-light text-xl">
-                  {userFeedback}
-                </h3>
+
+                {answerObj && answerObj.feedback.length > 0 ? (
+                  answerObj.feedback.map((fb, idx) => (
+                    <h3 key={idx} className="text-gray-500 font-light text-xl">
+                      - {fb.feedback}
+                    </h3>
+                  ))
+                ) : (
+                  <h3 className="text-red-300 font-light text-xl">
+                    No feedback yet
+                  </h3>
+                )}
               </div>
             );
           })}
