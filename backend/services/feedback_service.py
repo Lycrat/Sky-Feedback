@@ -32,7 +32,7 @@ def get_feedback_by_question_id(question_id):
         raise RuntimeError(f'Database query error: {e}')
 
     # Convert to a dictionary for easier consumption
-    return question_feedback[0]
+    return question_feedback
 
 #  GET feedback by feedback id
 def get_feedback(feedback_id):
@@ -43,7 +43,7 @@ def get_feedback(feedback_id):
         raise RuntimeError(f'Database query error: {e}')
 
     # Convert to a dictionary for easier consumption
-    return feedback[0]
+    return feedback
 
 
 #  ADD Feedback

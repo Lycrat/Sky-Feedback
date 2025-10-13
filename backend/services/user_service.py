@@ -3,10 +3,15 @@ import pymysql
 from database.data_access import DataAccess
 
 #  GET ALL Users
-def get_users():
+def get_users(username=None, name=None):
     data_access = DataAccess()
     try:
-        users = data_access.query("SELECT id, username, name FROM Users")
+        if username:
+            users = data_access.query("SELECT id, username, name FROM Users WHERE username = %s", username)
+        elif name:
+            users = data_access.query("SELECT id, username, name FROM Users WHERE name = %s", name)
+        else:
+            users = data_access.query("SELECT id, username, name FROM Users")
     except pymysql.MySQLError as e:
         raise RuntimeError(f'Database query error: {e}')
 
