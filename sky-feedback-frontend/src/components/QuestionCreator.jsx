@@ -1,28 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { TextField, Button, MenuItem, IconButton, Radio } from "@mui/material";
 import { Delete, Add } from "@mui/icons-material";
 
 export const QuestionCreator = ({ onQuestionChange, initialQuestions }) => {
   const [questions, setQuestions] = useState([
-    { id: Date.now(), question: "", type: "textarea", options: [] },
+    { id: Date.now(), question: "", type: "text", options: [] },
   ]);
-  const hasLoadedInitialData = useRef(false);
-
-  useEffect(() => {
-    // Only load initial data once, when it first arrives
-    if (initialQuestions && initialQuestions.length > 0 && !hasLoadedInitialData.current) {
-      console.log(initialQuestions)
-      let formattedQuestions = initialQuestions.map(obj => {
-        if (Array.isArray(obj.options) && obj.options.length === 0) {
-          return { ...obj, type: "textarea" };
-        } else {
-          return { ...obj, type: "multiple" };
-        }
-      });
-      setQuestions(formattedQuestions);
-      hasLoadedInitialData.current = true;
-    }
-  }, [initialQuestions]);
 
   useEffect(() => {
     if (onQuestionChange) {
@@ -33,7 +16,7 @@ export const QuestionCreator = ({ onQuestionChange, initialQuestions }) => {
   const addQuestion = () => {
     setQuestions((prev) => [
       ...prev,
-      { id: Date.now(), question: "", type: "textarea", options: [] },
+      { id: Date.now(), question: "", type: "text", options: [] },
     ]);
   };
 
@@ -118,7 +101,7 @@ export const QuestionCreator = ({ onQuestionChange, initialQuestions }) => {
                 }
                 className="w-full md:w-48"
               >
-                <MenuItem value="textarea">Paragraph</MenuItem>
+                <MenuItem value="text">Paragraph</MenuItem>
                 <MenuItem value="multiple">Multiple Choice</MenuItem>
               </TextField>
 

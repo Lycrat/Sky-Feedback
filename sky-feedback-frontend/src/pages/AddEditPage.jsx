@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router";
 import QuestionCreator from "../components/QuestionCreator";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
 const API_KEY = import.meta.env.VITE_API_URL
@@ -9,8 +9,8 @@ function AddEditPage({mode = "create"}) {
     let navigate = useNavigate();
     const formId = useParams().id;
     const [formTitle, setFormTitle] = useState("");
-    const [questions, setQuestions] = useState([]);
     
+    const questions = useRef();
 
     useEffect(() => {
         if (mode === "edit") {
@@ -23,34 +23,32 @@ function AddEditPage({mode = "create"}) {
                 const response = await axios.get(API_KEY + '/api/questionnaire/' + formId);
                 const data = response.data;
                 setFormTitle(data.questionnaire[0]?.title || "");
-                setQuestions(data.questions || []);
+                questions.current = data.questions || []
+                console.log(data)
             } catch (error) {
                 console.error(error);
             }
     };
 
     const handleQuestionsChange = (updatedQuestions) => {
-        setQuestions(updatedQuestions);
+        questions.current = updatedQuestions;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        const questionData = questions.map(question => question.text)
-
-        const formData = {
-        title: formTitle,
-        questions_list: questionData,
-        };
-        console.log(formData)
-        
-        console.log(`${mode === "edit" ? "Updating" : "Creating"} Form Data:`, formData);
+        console.log(formTitle, questions)
+        console.log(`${mode === "edit" ? "Updating" : "Creating"} Form Data`);
         
         try {
             if (mode === "edit") {
                 const response = await axios.put(API_KEY + '/api/questionnaire/' + formId, formData);
                 console.log(response.data)
             } else {
+                let formData = {
+                    title: formTitle,
+                    questions_list: questions
+                }
+                console.log(formData)
                 const response = await axios.post(API_KEY + '/api/questionnaire/', formData);
                 console.log(response.data);
             } 
