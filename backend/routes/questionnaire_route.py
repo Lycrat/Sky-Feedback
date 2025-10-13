@@ -139,7 +139,7 @@ def update_question(questionnaire_id, question_id):
         return jsonify({"error": "Question text is required"}), 400
     
     try:
-        updated_question = question_service.update_question(questionnaire_id, question_id, data)
+        updated_question = question_service.update_question(question_id, question_text)
         return jsonify(updated_question), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -160,6 +160,7 @@ def add_feedback(questionnaire_id, question_id):
     data = request.get_json()
     user_id = data.get('user_id')
     feedback_text = data.get('feedback')
+    print(feedback_text, question_id)
     if not user_id or not feedback_text:
         return jsonify({"error": "User ID and feedback text are required"}), 400
     
