@@ -19,6 +19,7 @@ const TextInput = ({ label, placeholder = "e.g. mrRobot", name, value }) => {
     </>
   );
 };
+
 const UserQuestionaire = () => {
   const [answers, setAnswers] = useState([]);
   const { id } = useParams();
@@ -60,21 +61,18 @@ const UserQuestionaire = () => {
 
     let user_id = null;
     // find user id
-    console.log(username, name);
     try {
       const res = await axios.get("http://localhost:5000/api/user/", {
         params: {
-          username: "Mr Robot",
-          name: "Panya",
+          username: username,
+          name: name,
         },
       });
       if (res.data) {
         user_id = res.data[0].id;
       }
-      console.log(user_id);
     } catch (err) {
       console.log(err);
-    } finally {
     }
 
     // Send feedbacks
@@ -87,7 +85,6 @@ const UserQuestionaire = () => {
             feedback: answer.feedback,
           }
         );
-        console.log(res.data);
       } catch (err) {
         console.log(err);
       } finally {
@@ -123,13 +120,35 @@ const UserQuestionaire = () => {
               <p className="font-bold text-gray-500 text-2xl">
                 {item.question}
               </p>
-              <textarea
-                type="text"
-                name="answer"
-                className="h-40 md:h-20 lg:h-60 border border-gray-300 rounded-sm p-5 "
-                value={getStoredAnswer(item.id)}
-                onChange={(e) => handleChange(e.target.value, item.id)}
-              />
+              {item.type === "multiple" ? (
+                <div className="flex flex-col px-5">
+                  {item.options.map((label, idx) => {
+                    return (
+                      <div key={idx}>
+                        <label className="flex flex-row gap-3">
+                          <input
+                            type="radio"
+                            value={label}
+                            name={`question-${id}`}
+                            onChange={(e) =>
+                              handleChange(e.target.value, item.id)
+                            }
+                          />
+                          {label}
+                        </label>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <textarea
+                  type="text"
+                  name="answer"
+                  className="h-40 md:h-20 lg:h-60 border border-gray-300 rounded-sm p-5 "
+                  value={getStoredAnswer(item.id)}
+                  onChange={(e) => handleChange(e.target.value, item.id)}
+                />
+              )}
             </Fragment>
           );
         })}
