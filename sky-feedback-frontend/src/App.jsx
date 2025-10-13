@@ -14,7 +14,7 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<HomeDashboard />} />
             <Route path="/questionnaire/:id" element={<UserQuestionaire />} />
-            <Route path="/view-data" element={<ViewData />} />
+            <Route path="/view-data/:formId" element={<ViewData />} />
           </Route>
           <Route path="question-creator" element={<QuestionCreator />} />
         </Routes>
